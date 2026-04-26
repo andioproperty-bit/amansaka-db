@@ -414,62 +414,49 @@ footer{background:#0c2340;color:rgba(255,255,255,0.7);padding:12px 24px;display:
 </div>
 
 <script>
-// ============================================================
-// KONFIGURASI GOOGLE SHEETS
-// ============================================================
-const SCRIPT_URL = const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz87bR7oB2SCI-5EUdWlPcse0RB5aaAeMZgQjbzvpxGyXtZnivlApccEdyVvAlLAFwfmQ/exec';
-// ============================================================
-// AUTH
-// ============================================================
-const PASS = { owner: 'owner123', marketing: 'marketing123' };
-let currentRole = null, selectedRole = 'owner', editId = null;
+var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz87bR7oB2SCI-5EUdWlPcse0RB5aaAeMZgQjbzvpxGyXtZnivlApccEdyVvAlLAFwfmQ/exec';
 
-// ============================================================
-// LOCAL DB CACHE
-// ============================================================
-let db = { leads: [], kampanye: [], produk: [], transaksi: [] };
+var PASS = { owner: 'owner123', marketing: 'marketing123' };
+var currentRole = null, selectedRole = 'owner', editId = null;
+var db = { leads: [], kampanye: [], produk: [], transaksi: [] };
 
-// ============================================================
-// UTILITIES
-// ============================================================
 function fmt(n) { return new Intl.NumberFormat('id-ID').format(Number(n)||0); }
 function isOwner() { return currentRole === 'owner'; }
 function nowStr() { return new Date().toLocaleDateString('id-ID',{day:'2-digit',month:'long',year:'numeric'}); }
 function genId() { return Date.now() + Math.floor(Math.random()*1000); }
 
-function showToast(msg, type='success') {
-  const t = document.getElementById('toast');
+function showToast(msg, type) {
+  type = type || 'success';
+  var t = document.getElementById('toast');
   t.textContent = msg;
   t.className = 'toast show ' + type;
-  setTimeout(() => t.className = 'toast', 3000);
+  setTimeout(function(){ t.className = 'toast'; }, 3000);
 }
 
 function setSyncStatus(status) {
-  const dot = document.getElementById('sync-dot');
-  const label = document.getElementById('sync-label');
+  var dot = document.getElementById('sync-dot');
+  var label = document.getElementById('sync-label');
   dot.className = 'sync-dot' + (status==='syncing'?' syncing':status==='error'?' error':'');
   label.textContent = status==='syncing'?'Menyimpan...':status==='error'?'Gagal sinkron':'Tersinkron';
 }
 
-function showLoading(text='Memuat data...') {
+function showLoading(text) {
+  text = text || 'Memuat data...';
   document.getElementById('loading-text').textContent = text;
   document.getElementById('loading-overlay').classList.add('show');
 }
 function hideLoading() { document.getElementById('loading-overlay').classList.remove('show'); }
 
-// ============================================================
-// GOOGLE SHEETS API
-// ============================================================
 async function gsRead(sheet) {
-  const url = SCRIPT_URL + '?sheet=' + sheet;
-  const res = await fetch(url);
+  var url = SCRIPT_URL + '?sheet=' + sheet;
+  var res = await fetch(url);
   if (!res.ok) throw new Error('Gagal membaca ' + sheet);
   return await res.json();
 }
 
 async function gsWrite(action, sheet, data, id) {
-  const payload = { action, sheet, data, id };
-  const res = await fetch(SCRIPT_URL, {
+  var payload = { action: action, sheet: sheet, data: data, id: id };
+  var res = await fetch(SCRIPT_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'text/plain' },
     body: JSON.stringify(payload)
@@ -480,10 +467,10 @@ async function gsWrite(action, sheet, data, id) {
 
 async function loadSheet(sheet) {
   try {
-    const rows = await gsRead(sheet);
-    db[sheet] = rows.map(r => {
-      const obj = {};
-      Object.keys(r).forEach(k => obj[k] = r[k]);
+    var rows = await gsRead(sheet);
+    db[sheet] = rows.map(function(r) {
+      var obj = {};
+      Object.keys(r).forEach(function(k){ obj[k] = r[k]; });
       if (r.id) obj.id = String(r.id);
       if (r.budget !== undefined) obj.budget = Number(r.budget)||0;
       if (r.target !== undefined) obj.target = Number(r.target)||0;
@@ -510,35 +497,32 @@ async function refreshAll() {
   ]);
   hideLoading();
   setSyncStatus('ok');
-  const page = document.querySelector('.page.active').id.replace('page-','');
+  var page = document.querySelector('.page.active').id.replace('page-','');
   if(page==='dashboard') updateDashboard();
   if(page==='leads') renderLeads();
   if(page==='kampanye') renderKampanye();
   if(page==='produk') renderProduk();
   if(page==='transaksi') renderTransaksi();
   if(page==='laporan') renderLaporan();
-  showToast('Data berhasil disinkronkan ✓');
+  showToast('Data berhasil disinkronkan');
 }
 
-// ============================================================
-// AUTH FUNCTIONS
-// ============================================================
 function selectRole(r, el) {
   selectedRole = r;
-  document.querySelectorAll('.role-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.role-tab').forEach(function(t){ t.classList.remove('active'); });
   el.classList.add('active');
   document.getElementById('login-pass').value = '';
   document.getElementById('login-err').style.display = 'none';
 }
 
 async function doLogin() {
-  const pass = document.getElementById('login-pass').value;
+  var pass = document.getElementById('login-pass').value;
   if (pass === PASS[selectedRole]) {
     currentRole = selectedRole;
     document.getElementById('login-screen').style.display = 'none';
-    const app = document.getElementById('app-screen');
+    var app = document.getElementById('app-screen');
     app.style.display = 'flex'; app.style.flexDirection = 'column';
-    const badge = document.getElementById('role-badge');
+    var badge = document.getElementById('role-badge');
     badge.textContent = isOwner() ? 'Owner' : 'Marketing';
     badge.className = 'sidebar-role ' + (isOwner() ? 'role-owner' : 'role-marketing');
     document.getElementById('user-label').textContent = isOwner() ? 'Owner' : 'Marketing';
@@ -557,21 +541,18 @@ function logout() {
   document.getElementById('login-screen').style.display = 'flex';
   document.getElementById('login-pass').value = '';
   document.getElementById('login-err').style.display = 'none';
-  document.querySelectorAll('.role-tab').forEach((t,i) => t.classList.toggle('active', i===0));
+  document.querySelectorAll('.role-tab').forEach(function(t,i){ t.classList.toggle('active', i===0); });
   selectedRole = 'owner';
   db = { leads:[], kampanye:[], produk:[], transaksi:[] };
 }
 
-// ============================================================
-// PAGE NAVIGATION
-// ============================================================
 async function showPage(id, el) {
   if (id==='laporan' && !isOwner()) return;
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('active'); });
+  document.querySelectorAll('.nav-item').forEach(function(n){ n.classList.remove('active'); });
   document.getElementById('page-'+id).classList.add('active');
   if (el) el.classList.add('active');
-  const titles = {dashboard:'Dashboard',leads:'Kontak / Lead',kampanye:'Kampanye',produk:'Produk',transaksi:'Transaksi',laporan:'Laporan Keuangan'};
+  var titles = {dashboard:'Dashboard',leads:'Kontak / Lead',kampanye:'Kampanye',produk:'Produk',transaksi:'Transaksi',laporan:'Laporan Keuangan'};
   document.getElementById('page-title').textContent = titles[id]||id;
   if(id==='dashboard') updateDashboard();
   if(id==='leads') renderLeads();
@@ -581,181 +562,134 @@ async function showPage(id, el) {
   if(id==='laporan') renderLaporan();
 }
 
-// ============================================================
-// BADGES
-// ============================================================
 function qualityBadge(q) {
-  const m = {Hot:'badge-hot',Warm:'badge-warm',Cold:'badge-cold',New:'badge-new'};
-  return `<span class="badge ${m[q]||''}">${q}</span>`;
+  var m = {Hot:'badge-hot',Warm:'badge-warm',Cold:'badge-cold',New:'badge-new'};
+  return '<span class="badge ' + (m[q]||'') + '">' + q + '</span>';
 }
 function statusBadge(s) {
-  const m = {Aktif:'badge-active','Tidak Aktif':'badge-inactive',Closed:'badge-closed',Sukses:'badge-active',Pending:'badge-warm',Gagal:'badge-hot',Selesai:'badge-inactive',Paused:'badge-paused'};
-  return `<span class="badge ${m[s]||''}">${s}</span>`;
+  var m = {Aktif:'badge-active','Tidak Aktif':'badge-inactive',Closed:'badge-closed',Sukses:'badge-active',Pending:'badge-warm',Gagal:'badge-hot',Selesai:'badge-inactive',Paused:'badge-paused'};
+  return '<span class="badge ' + (m[s]||'') + '">' + s + '</span>';
 }
 function prBadge(q) {
-  const colors = {Hot:'background:#fee2e2;color:#991b1b',Warm:'background:#fef3c7;color:#92400e',Cold:'background:#dbeafe;color:#1e40af',New:'background:#ede9fe;color:#5b21b6',Aktif:'background:#d1fae5;color:#065f46','Tidak Aktif':'background:#f3f4f6;color:#6b7280',Closed:'background:#fce7f3;color:#9d174d',Sukses:'background:#d1fae5;color:#065f46',Pending:'background:#fef3c7;color:#92400e',Gagal:'background:#fee2e2;color:#991b1b',Selesai:'background:#f3f4f6;color:#6b7280',Paused:'background:#f9fafb;color:#374151'};
-  return `<span class="pr-badge" style="${colors[q]||'background:#f3f4f6;color:#333'}">${q}</span>`;
+  var colors = {Hot:'background:#fee2e2;color:#991b1b',Warm:'background:#fef3c7;color:#92400e',Cold:'background:#dbeafe;color:#1e40af',New:'background:#ede9fe;color:#5b21b6',Aktif:'background:#d1fae5;color:#065f46','Tidak Aktif':'background:#f3f4f6;color:#6b7280',Closed:'background:#fce7f3;color:#9d174d',Sukses:'background:#d1fae5;color:#065f46',Pending:'background:#fef3c7;color:#92400e',Gagal:'background:#fee2e2;color:#991b1b',Selesai:'background:#f3f4f6;color:#6b7280',Paused:'background:#f9fafb;color:#374151'};
+  return '<span class="pr-badge" style="' + (colors[q]||'background:#f3f4f6;color:#333') + '">' + q + '</span>';
 }
 
-// ============================================================
-// DASHBOARD
-// ============================================================
 function updateDashboard() {
   document.getElementById('d-leads').textContent = db.leads.length;
-  document.getElementById('d-camp').textContent = db.kampanye.filter(c=>c.status==='Aktif').length;
+  document.getElementById('d-camp').textContent = db.kampanye.filter(function(c){return c.status==='Aktif';}).length;
   document.getElementById('d-prod').textContent = db.produk.length;
-  const sukses = db.transaksi.filter(t=>t.status==='Sukses');
-  const total = sukses.reduce((s,t)=>s+Number(t.amount),0);
-  const omzetEl = document.getElementById('d-omzet');
-  const omzetCard = document.getElementById('stat-omzet');
+  var sukses = db.transaksi.filter(function(t){return t.status==='Sukses';});
+  var total = sukses.reduce(function(s,t){return s+Number(t.amount);},0);
+  var omzetEl = document.getElementById('d-omzet');
+  var omzetCard = document.getElementById('stat-omzet');
   omzetEl.textContent = 'Rp ' + fmt(total);
   if(isOwner()){omzetEl.classList.remove('omzet-blur');omzetCard.classList.remove('locked-overlay');}
   else{omzetEl.classList.add('omzet-blur');omzetCard.classList.add('locked-overlay');}
   document.getElementById('d-trans-count').textContent = sukses.length + ' transaksi sukses';
 
-  const qc = {Hot:0,Warm:0,Cold:0,New:0};
-  db.leads.forEach(l => qc[l.quality] = (qc[l.quality]||0)+1);
-  const max = Math.max(...Object.values(qc), 1);
-  const colors = {Hot:'#ef4444',Warm:'#f59e0b',Cold:'#3b82f6',New:'#8b5cf6'};
-  document.getElementById('lead-quality-chart').innerHTML = Object.entries(qc).map(([k,v]) =>
-    `<div class="chart-bar-row"><div class="chart-bar-label">${k}</div><div class="chart-bar-track"><div class="chart-bar-fill" style="width:${Math.round(v/max*100)}%;background:${colors[k]}"></div></div><div class="chart-bar-val">${v}</div></div>`
-  ).join('');
+  var qc = {Hot:0,Warm:0,Cold:0,New:0};
+  db.leads.forEach(function(l){ qc[l.quality] = (qc[l.quality]||0)+1; });
+  var max = Math.max.apply(null, Object.values(qc).concat([1]));
+  var colors = {Hot:'#ef4444',Warm:'#f59e0b',Cold:'#3b82f6',New:'#8b5cf6'};
+  document.getElementById('lead-quality-chart').innerHTML = Object.entries(qc).map(function(e){
+    return '<div class="chart-bar-row"><div class="chart-bar-label">'+e[0]+'</div><div class="chart-bar-track"><div class="chart-bar-fill" style="width:'+Math.round(e[1]/max*100)+'%;background:'+colors[e[0]]+'"></div></div><div class="chart-bar-val">'+e[1]+'</div></div>';
+  }).join('');
 
-  document.getElementById('recent-leads').innerHTML = db.leads.slice(-5).reverse().map(l =>
-    `<li><span>${l.name}</span>${qualityBadge(l.quality)}</li>`
-  ).join('') || '<li><span style="color:#aaa">Belum ada data</span></li>';
+  document.getElementById('recent-leads').innerHTML = db.leads.slice(-5).reverse().map(function(l){
+    return '<li><span>'+l.name+'</span>'+qualityBadge(l.quality)+'</li>';
+  }).join('') || '<li><span style="color:#aaa">Belum ada data</span></li>';
 
-  document.getElementById('recent-trans').innerHTML = db.transaksi.slice(-5).reverse().map(t =>
-    `<li><span>${t.lead}</span><span class="${isOwner()?'':'omzet-blur'}" style="font-weight:700">Rp ${fmt(t.amount)}</span></li>`
-  ).join('') || '<li><span style="color:#aaa">Belum ada data</span></li>';
+  document.getElementById('recent-trans').innerHTML = db.transaksi.slice(-5).reverse().map(function(t){
+    return '<li><span>'+t.lead+'</span><span class="'+(isOwner()?'':'omzet-blur')+'" style="font-weight:700">Rp '+fmt(t.amount)+'</span></li>';
+  }).join('') || '<li><span style="color:#aaa">Belum ada data</span></li>';
 
-  document.getElementById('active-camps').innerHTML = db.kampanye.filter(c=>c.status==='Aktif').map(c =>
-    `<li><span>${c.name}</span><span style="font-size:11px;color:#888">${c.type}</span></li>`
-  ).join('') || '<li><span style="color:#aaa">Tidak ada kampanye aktif</span></li>';
+  document.getElementById('active-camps').innerHTML = db.kampanye.filter(function(c){return c.status==='Aktif';}).map(function(c){
+    return '<li><span>'+c.name+'</span><span style="font-size:11px;color:#888">'+c.type+'</span></li>';
+  }).join('') || '<li><span style="color:#aaa">Tidak ada kampanye aktif</span></li>';
 }
 
-// ============================================================
-// RENDER TABLES
-// ============================================================
 function renderLeads() {
-  const s = (document.getElementById('lead-search').value||'').toLowerCase();
-  const q = document.getElementById('lead-filter-quality').value;
-  const st = document.getElementById('lead-filter-status').value;
-  const rows = db.leads.filter(l => {
-    if(s && !`${l.name}${l.email}${l.company}`.toLowerCase().includes(s)) return false;
+  var s = (document.getElementById('lead-search').value||'').toLowerCase();
+  var q = document.getElementById('lead-filter-quality').value;
+  var st = document.getElementById('lead-filter-status').value;
+  var rows = db.leads.filter(function(l) {
+    if(s && !(l.name+l.email+l.company).toLowerCase().includes(s)) return false;
     if(q && l.quality!==q) return false;
     if(st && l.status!==st) return false;
     return true;
   });
-  const tbody = document.getElementById('lead-table');
-  if(!rows.length){tbody.innerHTML=`<tr class="empty-row"><td colspan="7">Tidak ada data ditemukan</td></tr>`;return;}
-  tbody.innerHTML = rows.map(l => `<tr>
-    <td title="${l.name}">${l.name}</td><td title="${l.email}">${l.email}</td>
-    <td>${l.company}</td><td>${qualityBadge(l.quality)}</td><td>${statusBadge(l.status)}</td>
-    <td>${l.camp||'—'}</td>
-    <td><div class="td-action">
-      <button class="icon-btn" onclick="editLead('${l.id}')" title="Edit">✎</button>
-      <button class="icon-btn" ${!isOwner()?'disabled title="Hanya Owner"':''} onclick="${isOwner()?`delItem('leads','${l.id}')`:''}" title="Hapus">✕</button>
-    </div></td>
-  </tr>`).join('');
+  var tbody = document.getElementById('lead-table');
+  if(!rows.length){tbody.innerHTML='<tr class="empty-row"><td colspan="7">Tidak ada data ditemukan</td></tr>';return;}
+  tbody.innerHTML = rows.map(function(l){
+    return '<tr><td title="'+l.name+'">'+l.name+'</td><td title="'+l.email+'">'+l.email+'</td><td>'+l.company+'</td><td>'+qualityBadge(l.quality)+'</td><td>'+statusBadge(l.status)+'</td><td>'+(l.camp||'—')+'</td><td><div class="td-action"><button class="icon-btn" onclick="editLead(\''+l.id+'\')" title="Edit">✎</button><button class="icon-btn" '+(isOwner()?'onclick="delItem(\'leads\',\''+l.id+'\')"':'disabled title="Hanya Owner"')+' title="Hapus">✕</button></div></td></tr>';
+  }).join('');
 }
 
 function renderKampanye() {
-  const s = (document.getElementById('camp-search').value||'').toLowerCase();
-  const st = document.getElementById('camp-filter').value;
-  const rows = db.kampanye.filter(c => {
+  var s = (document.getElementById('camp-search').value||'').toLowerCase();
+  var st = document.getElementById('camp-filter').value;
+  var rows = db.kampanye.filter(function(c) {
     if(s && !c.name.toLowerCase().includes(s)) return false;
     if(st && c.status!==st) return false;
     return true;
   });
-  const lc = name => db.leads.filter(l=>l.camp===name).length;
-  const tbody = document.getElementById('camp-table');
-  if(!rows.length){tbody.innerHTML=`<tr class="empty-row"><td colspan="8">Tidak ada data ditemukan</td></tr>`;return;}
-  tbody.innerHTML = rows.map(c => `<tr>
-    <td>${c.name}</td><td>${c.type}</td><td>${statusBadge(c.status)}</td>
-    <td>${isOwner()?'Rp '+fmt(c.budget):'<span class="omzet-blur">Rp '+fmt(c.budget)+'</span>'}</td>
-    <td>${lc(c.name)}</td><td>${c.start}</td><td>${c.end}</td>
-    <td><div class="td-action">
-      <button class="icon-btn" onclick="editKampanye('${c.id}')">✎</button>
-      <button class="icon-btn" ${!isOwner()?'disabled':''} onclick="${isOwner()?`delItem('kampanye','${c.id}')`:''}" title="Hapus">✕</button>
-    </div></td>
-  </tr>`).join('');
+  var tbody = document.getElementById('camp-table');
+  if(!rows.length){tbody.innerHTML='<tr class="empty-row"><td colspan="8">Tidak ada data ditemukan</td></tr>';return;}
+  tbody.innerHTML = rows.map(function(c){
+    var lc = db.leads.filter(function(l){return l.camp===c.name;}).length;
+    return '<tr><td>'+c.name+'</td><td>'+c.type+'</td><td>'+statusBadge(c.status)+'</td><td>'+(isOwner()?'Rp '+fmt(c.budget):'<span class="omzet-blur">Rp '+fmt(c.budget)+'</span>')+'</td><td>'+lc+'</td><td>'+c.start+'</td><td>'+c.end+'</td><td><div class="td-action"><button class="icon-btn" onclick="editKampanye(\''+c.id+'\')">✎</button><button class="icon-btn" '+(isOwner()?'onclick="delItem(\'kampanye\',\''+c.id+'\')"':'disabled')+' title="Hapus">✕</button></div></td></tr>';
+  }).join('');
 }
 
 function renderProduk() {
-  const s = (document.getElementById('prod-search').value||'').toLowerCase();
-  const cat = document.getElementById('prod-filter').value;
-  const rows = db.produk.filter(p => {
+  var s = (document.getElementById('prod-search').value||'').toLowerCase();
+  var cat = document.getElementById('prod-filter').value;
+  var rows = db.produk.filter(function(p) {
     if(s && !p.name.toLowerCase().includes(s)) return false;
     if(cat && p.cat!==cat) return false;
     return true;
   });
-  const tbody = document.getElementById('prod-table');
-  if(!rows.length){tbody.innerHTML=`<tr class="empty-row"><td colspan="7">Tidak ada data ditemukan</td></tr>`;return;}
-  tbody.innerHTML = rows.map(p => `<tr>
-    <td>${p.name}</td><td>${p.cat}</td>
-    <td>${isOwner()?'Rp '+fmt(p.price):'<span class="omzet-blur">Rp '+fmt(p.price)+'</span>'}</td>
-    <td>${p.stock==0&&p.cat!=='Layanan'?'<span style="color:#ef4444">Habis</span>':p.stock}</td>
-    <td>${statusBadge(p.status)}</td><td>${p.sold} unit</td>
-    <td><div class="td-action">
-      <button class="icon-btn" onclick="${isOwner()?`editProduk('${p.id}')`:``}" ${!isOwner()?'disabled title="Hanya Owner"':''}>✎</button>
-      <button class="icon-btn" ${!isOwner()?'disabled':''} onclick="${isOwner()?`delItem('produk','${p.id}')`:''}" title="Hapus">✕</button>
-    </div></td>
-  </tr>`).join('');
+  var tbody = document.getElementById('prod-table');
+  if(!rows.length){tbody.innerHTML='<tr class="empty-row"><td colspan="7">Tidak ada data ditemukan</td></tr>';return;}
+  tbody.innerHTML = rows.map(function(p){
+    return '<tr><td>'+p.name+'</td><td>'+p.cat+'</td><td>'+(isOwner()?'Rp '+fmt(p.price):'<span class="omzet-blur">Rp '+fmt(p.price)+'</span>')+'</td><td>'+(p.stock==0&&p.cat!=='Layanan'?'<span style="color:#ef4444">Habis</span>':p.stock)+'</td><td>'+statusBadge(p.status)+'</td><td>'+p.sold+' unit</td><td><div class="td-action"><button class="icon-btn" '+(isOwner()?'onclick="editProduk(\''+p.id+'\')"':'disabled title="Hanya Owner"')+'>✎</button><button class="icon-btn" '+(isOwner()?'onclick="delItem(\'produk\',\''+p.id+'\')"':'disabled')+' title="Hapus">✕</button></div></td></tr>';
+  }).join('');
 }
 
 function renderTransaksi() {
-  const s = (document.getElementById('trans-search').value||'').toLowerCase();
-  const st = document.getElementById('trans-filter').value;
-  const rows = db.transaksi.filter(t => {
-    if(s && !`${t.lead}${t.prod}`.toLowerCase().includes(s)) return false;
+  var s = (document.getElementById('trans-search').value||'').toLowerCase();
+  var st = document.getElementById('trans-filter').value;
+  var rows = db.transaksi.filter(function(t) {
+    if(s && !(t.lead+t.prod).toLowerCase().includes(s)) return false;
     if(st && t.status!==st) return false;
     return true;
   });
-  const tbody = document.getElementById('trans-table');
-  if(!rows.length){tbody.innerHTML=`<tr class="empty-row"><td colspan="7">Tidak ada data ditemukan</td></tr>`;return;}
-  tbody.innerHTML = rows.map(t => `<tr>
-    <td>${t.lead}</td><td>${t.prod}</td><td>${t.camp||'—'}</td>
-    <td>${isOwner()?'Rp '+fmt(t.amount):'<span class="omzet-blur">Rp '+fmt(t.amount)+'</span>'}</td>
-    <td>${statusBadge(t.status)}</td><td>${t.date}</td>
-    <td><div class="td-action">
-      <button class="icon-btn" onclick="editTransaksi('${t.id}')">✎</button>
-      <button class="icon-btn" ${!isOwner()?'disabled':''} onclick="${isOwner()?`delItem('transaksi','${t.id}')`:''}" title="Hapus">✕</button>
-    </div></td>
-  </tr>`).join('');
+  var tbody = document.getElementById('trans-table');
+  if(!rows.length){tbody.innerHTML='<tr class="empty-row"><td colspan="7">Tidak ada data ditemukan</td></tr>';return;}
+  tbody.innerHTML = rows.map(function(t){
+    return '<tr><td>'+t.lead+'</td><td>'+t.prod+'</td><td>'+(t.camp||'—')+'</td><td>'+(isOwner()?'Rp '+fmt(t.amount):'<span class="omzet-blur">Rp '+fmt(t.amount)+'</span>')+'</td><td>'+statusBadge(t.status)+'</td><td>'+t.date+'</td><td><div class="td-action"><button class="icon-btn" onclick="editTransaksi(\''+t.id+'\')">✎</button><button class="icon-btn" '+(isOwner()?'onclick="delItem(\'transaksi\',\''+t.id+'\')"':'disabled')+' title="Hapus">✕</button></div></td></tr>';
+  }).join('');
 }
 
 function renderLaporan() {
-  if(!isOwner()){document.getElementById('laporan-content').innerHTML=`<div class="access-denied"><div style="font-size:36px;margin-bottom:12px">🔒</div><h3>Akses Terbatas</h3><p>Halaman ini hanya untuk Owner.</p></div>`;return;}
-  const sukses = db.transaksi.filter(t=>t.status==='Sukses');
-  const totalOmzet = sukses.reduce((s,t)=>s+Number(t.amount),0);
-  const totalAnggaran = db.kampanye.reduce((s,c)=>s+Number(c.budget),0);
-  const roi = totalAnggaran ? ((totalOmzet/totalAnggaran)*100).toFixed(1):'0';
-  const perProduk={};sukses.forEach(t=>{perProduk[t.prod]=(perProduk[t.prod]||0)+Number(t.amount)});
-  const perKamp={};sukses.forEach(t=>{if(t.camp)perKamp[t.camp]=(perKamp[t.camp]||0)+Number(t.amount)});
-  document.getElementById('laporan-content').innerHTML=`
-    <div class="stat-grid">
-      <div class="stat-card"><div class="stat-label">Total Omzet</div><div class="stat-val" style="color:#065f46">Rp ${fmt(totalOmzet)}</div><div class="stat-sub">${sukses.length} transaksi sukses</div></div>
-      <div class="stat-card"><div class="stat-label">Total Anggaran</div><div class="stat-val" style="color:#1e40af">Rp ${fmt(totalAnggaran)}</div><div class="stat-sub">${db.kampanye.length} kampanye</div></div>
-      <div class="stat-card"><div class="stat-label">ROI Estimasi</div><div class="stat-val" style="color:#92400e">${roi}%</div><div class="stat-sub">Omzet / Anggaran</div></div>
-      <div class="stat-card"><div class="stat-label">Rata-rata Transaksi</div><div class="stat-val">Rp ${fmt(sukses.length?Math.round(totalOmzet/sukses.length):0)}</div><div class="stat-sub">per transaksi sukses</div></div>
-    </div>
-    <div class="section-row">
-      <div class="card"><div class="card-title">Omzet per Produk</div>${Object.entries(perProduk).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid #f0f2f5;font-size:12px"><span>${k}</span><strong>Rp ${fmt(v)}</strong></div>`).join('')||'<div style="color:#aaa;font-size:12px">Belum ada data</div>'}</div>
-      <div class="card"><div class="card-title">Omzet per Kampanye</div>${Object.entries(perKamp).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid #f0f2f5;font-size:12px"><span>${k}</span><strong>Rp ${fmt(v)}</strong></div>`).join('')||'<div style="color:#aaa;font-size:12px">Belum ada data</div>'}</div>
-    </div>`;
+  if(!isOwner()){document.getElementById('laporan-content').innerHTML='<div class="access-denied"><div style="font-size:36px;margin-bottom:12px">🔒</div><h3>Akses Terbatas</h3><p>Halaman ini hanya untuk Owner.</p></div>';return;}
+  var sukses = db.transaksi.filter(function(t){return t.status==='Sukses';});
+  var totalOmzet = sukses.reduce(function(s,t){return s+Number(t.amount);},0);
+  var totalAnggaran = db.kampanye.reduce(function(s,c){return s+Number(c.budget);},0);
+  var roi = totalAnggaran ? ((totalOmzet/totalAnggaran)*100).toFixed(1):'0';
+  var perProduk={};sukses.forEach(function(t){perProduk[t.prod]=(perProduk[t.prod]||0)+Number(t.amount);});
+  var perKamp={};sukses.forEach(function(t){if(t.camp)perKamp[t.camp]=(perKamp[t.camp]||0)+Number(t.amount);});
+  document.getElementById('laporan-content').innerHTML='<div class="stat-grid"><div class="stat-card"><div class="stat-label">Total Omzet</div><div class="stat-val" style="color:#065f46">Rp '+fmt(totalOmzet)+'</div><div class="stat-sub">'+sukses.length+' transaksi sukses</div></div><div class="stat-card"><div class="stat-label">Total Anggaran</div><div class="stat-val" style="color:#1e40af">Rp '+fmt(totalAnggaran)+'</div><div class="stat-sub">'+db.kampanye.length+' kampanye</div></div><div class="stat-card"><div class="stat-label">ROI Estimasi</div><div class="stat-val" style="color:#92400e">'+roi+'%</div><div class="stat-sub">Omzet / Anggaran</div></div><div class="stat-card"><div class="stat-label">Rata-rata Transaksi</div><div class="stat-val">Rp '+fmt(sukses.length?Math.round(totalOmzet/sukses.length):0)+'</div><div class="stat-sub">per transaksi sukses</div></div></div><div class="section-row"><div class="card"><div class="card-title">Omzet per Produk</div>'+Object.entries(perProduk).sort(function(a,b){return b[1]-a[1];}).map(function(e){return '<div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid #f0f2f5;font-size:12px"><span>'+e[0]+'</span><strong>Rp '+fmt(e[1])+'</strong></div>';}).join('')+'</div><div class="card"><div class="card-title">Omzet per Kampanye</div>'+Object.entries(perKamp).sort(function(a,b){return b[1]-a[1];}).map(function(e){return '<div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid #f0f2f5;font-size:12px"><span>'+e[0]+'</span><strong>Rp '+fmt(e[1])+'</strong></div>';}).join('')+'</div></div>';
 }
 
-// ============================================================
-// DELETE
-// ============================================================
 async function delItem(type, id) {
   if(!isOwner()){alert('Hanya Owner yang dapat menghapus data.');return;}
-  if(!confirm('Yakin ingin menghapus data ini? Data akan dihapus permanen dari Google Sheets.')) return;
+  if(!confirm('Yakin ingin menghapus data ini?')) return;
   setSyncStatus('syncing');
   try {
     await gsWrite('delete', type, {}, id);
-    db[type] = db[type].filter(x=>String(x.id)!==String(id));
+    db[type] = db[type].filter(function(x){return String(x.id)!==String(id);});
     if(type==='leads') renderLeads();
     if(type==='kampanye') renderKampanye();
     if(type==='produk') renderProduk();
@@ -764,65 +698,59 @@ async function delItem(type, id) {
     showToast('Data berhasil dihapus');
   } catch(e) {
     setSyncStatus('error');
-    showToast('Gagal menghapus data. Coba lagi.','error');
+    showToast('Gagal menghapus data.','error');
   }
 }
 
-// ============================================================
-// OPEN MODALS
-// ============================================================
 function openModal(type) {
   editId = null;
   if(type==='lead'){
     document.getElementById('lead-modal-title').textContent='Tambah Lead Baru';
-    ['l-name','l-email','l-phone','l-company','l-notes'].forEach(id=>document.getElementById(id).value='');
+    ['l-name','l-email','l-phone','l-company','l-notes'].forEach(function(id){document.getElementById(id).value='';});
     document.getElementById('l-quality').value='Hot';document.getElementById('l-status').value='Aktif';
-    const sel=document.getElementById('l-camp');
-    sel.innerHTML='<option value="">-- Pilih Kampanye --</option>'+db.kampanye.map(c=>`<option>${c.name}</option>`).join('');
+    var sel=document.getElementById('l-camp');
+    sel.innerHTML='<option value="">-- Pilih Kampanye --</option>'+db.kampanye.map(function(c){return '<option>'+c.name+'</option>';}).join('');
   }
   if(type==='kampanye'){
     document.getElementById('camp-modal-title').textContent='Tambah Kampanye Baru';
-    ['c-name','c-budget','c-target','c-start','c-end'].forEach(id=>document.getElementById(id).value='');
+    ['c-name','c-budget','c-target','c-start','c-end'].forEach(function(id){document.getElementById(id).value='';});
     document.getElementById('c-type').value='Email';document.getElementById('c-status').value='Aktif';
   }
   if(type==='produk'){
     if(!isOwner()){alert('Hanya Owner yang dapat mengubah data produk.');return;}
     document.getElementById('prod-modal-title').textContent='Tambah Produk Baru';
-    ['p-name','p-price','p-stock','p-desc'].forEach(id=>document.getElementById(id).value='');
+    ['p-name','p-price','p-stock','p-desc'].forEach(function(id){document.getElementById(id).value='';});
     document.getElementById('p-cat').value='Fisik';document.getElementById('p-status').value='Aktif';
   }
   if(type==='transaksi'){
     document.getElementById('trans-modal-title').textContent='Tambah Transaksi Baru';
-    ['t-amount','t-date'].forEach(id=>document.getElementById(id).value='');
+    ['t-amount','t-date'].forEach(function(id){document.getElementById(id).value='';});
     document.getElementById('t-status').value='Sukses';
-    const tl=document.getElementById('t-lead');
-    tl.innerHTML='<option value="">-- Pilih Lead --</option>'+db.leads.map(l=>`<option>${l.name}</option>`).join('');
-    const tp=document.getElementById('t-prod');
-    tp.innerHTML='<option value="">-- Pilih Produk --</option>'+db.produk.map(p=>`<option value="${p.price}" data-name="${p.name}">${p.name}</option>`).join('');
+    var tl=document.getElementById('t-lead');
+    tl.innerHTML='<option value="">-- Pilih Lead --</option>'+db.leads.map(function(l){return '<option>'+l.name+'</option>';}).join('');
+    var tp=document.getElementById('t-prod');
+    tp.innerHTML='<option value="">-- Pilih Produk --</option>'+db.produk.map(function(p){return '<option value="'+p.price+'" data-name="'+p.name+'">'+p.name+'</option>';}).join('');
     tp.onchange=function(){if(this.value)document.getElementById('t-amount').value=this.value;};
-    const tc=document.getElementById('t-camp');
-    tc.innerHTML='<option value="">-- Opsional --</option>'+db.kampanye.map(c=>`<option>${c.name}</option>`).join('');
+    var tc=document.getElementById('t-camp');
+    tc.innerHTML='<option value="">-- Opsional --</option>'+db.kampanye.map(function(c){return '<option>'+c.name+'</option>';}).join('');
   }
   document.getElementById('modal-'+type).classList.add('open');
 }
-function closeModal(type){document.getElementById('modal-'+type).classList.remove('open')}
+function closeModal(type){document.getElementById('modal-'+type).classList.remove('open');}
 
-// ============================================================
-// EDIT MODALS
-// ============================================================
 function editLead(id){
-  const l=db.leads.find(x=>String(x.id)===String(id));if(!l)return;editId=id;
+  var l=db.leads.find(function(x){return String(x.id)===String(id);});if(!l)return;editId=id;
   document.getElementById('lead-modal-title').textContent='Edit Lead';
   document.getElementById('l-name').value=l.name||'';document.getElementById('l-email').value=l.email||'';
   document.getElementById('l-phone').value=l.phone||'';document.getElementById('l-company').value=l.company||'';
   document.getElementById('l-quality').value=l.quality||'Hot';document.getElementById('l-status').value=l.status||'Aktif';
   document.getElementById('l-notes').value=l.notes||'';
-  const sel=document.getElementById('l-camp');
-  sel.innerHTML='<option value="">-- Pilih Kampanye --</option>'+db.kampanye.map(c=>`<option ${c.name===l.camp?'selected':''}>${c.name}</option>`).join('');
+  var sel=document.getElementById('l-camp');
+  sel.innerHTML='<option value="">-- Pilih Kampanye --</option>'+db.kampanye.map(function(c){return '<option '+(c.name===l.camp?'selected':'')+'>'+c.name+'</option>';}).join('');
   document.getElementById('modal-lead').classList.add('open');
 }
 function editKampanye(id){
-  const c=db.kampanye.find(x=>String(x.id)===String(id));if(!c)return;editId=id;
+  var c=db.kampanye.find(function(x){return String(x.id)===String(id);});if(!c)return;editId=id;
   document.getElementById('camp-modal-title').textContent='Edit Kampanye';
   document.getElementById('c-name').value=c.name||'';document.getElementById('c-type').value=c.type||'Email';
   document.getElementById('c-status').value=c.status||'Aktif';document.getElementById('c-budget').value=c.budget||0;
@@ -832,7 +760,7 @@ function editKampanye(id){
 }
 function editProduk(id){
   if(!isOwner()){alert('Hanya Owner.');return;}
-  const p=db.produk.find(x=>String(x.id)===String(id));if(!p)return;editId=id;
+  var p=db.produk.find(function(x){return String(x.id)===String(id);});if(!p)return;editId=id;
   document.getElementById('prod-modal-title').textContent='Edit Produk';
   document.getElementById('p-name').value=p.name||'';document.getElementById('p-cat').value=p.cat||'Fisik';
   document.getElementById('p-price').value=p.price||0;document.getElementById('p-stock').value=p.stock||0;
@@ -840,38 +768,35 @@ function editProduk(id){
   document.getElementById('modal-produk').classList.add('open');
 }
 function editTransaksi(id){
-  const t=db.transaksi.find(x=>String(x.id)===String(id));if(!t)return;editId=id;
+  var t=db.transaksi.find(function(x){return String(x.id)===String(id);});if(!t)return;editId=id;
   document.getElementById('trans-modal-title').textContent='Edit Transaksi';
-  const tl=document.getElementById('t-lead');
-  tl.innerHTML='<option value="">-- Pilih Lead --</option>'+db.leads.map(l=>`<option ${l.name===t.lead?'selected':''}>${l.name}</option>`).join('');
-  const tp=document.getElementById('t-prod');
-  tp.innerHTML='<option value="">-- Pilih Produk --</option>'+db.produk.map(p=>`<option value="${p.price}" data-name="${p.name}" ${p.name===t.prod?'selected':''}>${p.name}</option>`).join('');
+  var tl=document.getElementById('t-lead');
+  tl.innerHTML='<option value="">-- Pilih Lead --</option>'+db.leads.map(function(l){return '<option '+(l.name===t.lead?'selected':'')+'>'+l.name+'</option>';}).join('');
+  var tp=document.getElementById('t-prod');
+  tp.innerHTML='<option value="">-- Pilih Produk --</option>'+db.produk.map(function(p){return '<option value="'+p.price+'" data-name="'+p.name+'" '+(p.name===t.prod?'selected':'')+'>'+p.name+'</option>';}).join('');
   tp.onchange=function(){if(this.value)document.getElementById('t-amount').value=this.value;};
-  const tc=document.getElementById('t-camp');
-  tc.innerHTML='<option value="">-- Opsional --</option>'+db.kampanye.map(c=>`<option ${c.name===t.camp?'selected':''}>${c.name}</option>`).join('');
+  var tc=document.getElementById('t-camp');
+  tc.innerHTML='<option value="">-- Opsional --</option>'+db.kampanye.map(function(c){return '<option '+(c.name===t.camp?'selected':'')+'>'+c.name+'</option>';}).join('');
   document.getElementById('t-amount').value=t.amount||0;
   document.getElementById('t-status').value=t.status||'Sukses';document.getElementById('t-date').value=t.date||'';
   document.getElementById('modal-transaksi').classList.add('open');
 }
 
-// ============================================================
-// SAVE FUNCTIONS
-// ============================================================
 function setBtnLoading(btnId, loading) {
-  const btn = document.getElementById(btnId);
+  var btn = document.getElementById(btnId);
   if(!btn) return;
   btn.disabled = loading;
   btn.textContent = loading ? 'Menyimpan...' : 'Simpan';
 }
 
 async function saveLead(){
-  const obj={id:editId||genId(),name:document.getElementById('l-name').value.trim(),email:document.getElementById('l-email').value.trim(),phone:document.getElementById('l-phone').value.trim(),company:document.getElementById('l-company').value.trim(),quality:document.getElementById('l-quality').value,status:document.getElementById('l-status').value,camp:document.getElementById('l-camp').value,notes:document.getElementById('l-notes').value.trim()};
+  var obj={id:editId||genId(),name:document.getElementById('l-name').value.trim(),email:document.getElementById('l-email').value.trim(),phone:document.getElementById('l-phone').value.trim(),company:document.getElementById('l-company').value.trim(),quality:document.getElementById('l-quality').value,status:document.getElementById('l-status').value,camp:document.getElementById('l-camp').value,notes:document.getElementById('l-notes').value.trim()};
   if(!obj.name){alert('Nama wajib diisi');return;}
   setBtnLoading('save-lead-btn',true);setSyncStatus('syncing');
   try{
-    const action=editId?'update':'add';
+    var action=editId?'update':'add';
     await gsWrite(action,'leads',obj,editId);
-    if(editId) db.leads=db.leads.map(x=>String(x.id)===String(editId)?obj:x);
+    if(editId) db.leads=db.leads.map(function(x){return String(x.id)===String(editId)?obj:x;});
     else db.leads.push(obj);
     closeModal('lead');renderLeads();updateDashboard();
     setSyncStatus('ok');showToast(editId?'Lead berhasil diperbarui':'Lead berhasil ditambahkan');
@@ -880,13 +805,13 @@ async function saveLead(){
 }
 
 async function saveKampanye(){
-  const obj={id:editId||genId(),name:document.getElementById('c-name').value.trim(),type:document.getElementById('c-type').value,status:document.getElementById('c-status').value,budget:parseInt(document.getElementById('c-budget').value)||0,target:parseInt(document.getElementById('c-target').value)||0,start:document.getElementById('c-start').value,end:document.getElementById('c-end').value};
+  var obj={id:editId||genId(),name:document.getElementById('c-name').value.trim(),type:document.getElementById('c-type').value,status:document.getElementById('c-status').value,budget:parseInt(document.getElementById('c-budget').value)||0,target:parseInt(document.getElementById('c-target').value)||0,start:document.getElementById('c-start').value,end:document.getElementById('c-end').value};
   if(!obj.name){alert('Nama wajib diisi');return;}
   setBtnLoading('save-camp-btn',true);setSyncStatus('syncing');
   try{
-    const action=editId?'update':'add';
+    var action=editId?'update':'add';
     await gsWrite(action,'kampanye',obj,editId);
-    if(editId) db.kampanye=db.kampanye.map(x=>String(x.id)===String(editId)?obj:x);
+    if(editId) db.kampanye=db.kampanye.map(function(x){return String(x.id)===String(editId)?obj:x;});
     else db.kampanye.push(obj);
     closeModal('kampanye');renderKampanye();updateDashboard();
     setSyncStatus('ok');showToast(editId?'Kampanye berhasil diperbarui':'Kampanye berhasil ditambahkan');
@@ -896,14 +821,14 @@ async function saveKampanye(){
 
 async function saveProduk(){
   if(!isOwner()){alert('Hanya Owner.');return;}
-  const existing=editId?db.produk.find(x=>String(x.id)===String(editId)):null;
-  const obj={id:editId||genId(),name:document.getElementById('p-name').value.trim(),cat:document.getElementById('p-cat').value,price:parseInt(document.getElementById('p-price').value)||0,stock:parseInt(document.getElementById('p-stock').value)||0,status:document.getElementById('p-status').value,desc:document.getElementById('p-desc').value.trim(),sold:existing?existing.sold:0};
+  var existing=editId?db.produk.find(function(x){return String(x.id)===String(editId);}):null;
+  var obj={id:editId||genId(),name:document.getElementById('p-name').value.trim(),cat:document.getElementById('p-cat').value,price:parseInt(document.getElementById('p-price').value)||0,stock:parseInt(document.getElementById('p-stock').value)||0,status:document.getElementById('p-status').value,desc:document.getElementById('p-desc').value.trim(),sold:existing?existing.sold:0};
   if(!obj.name){alert('Nama wajib diisi');return;}
   setBtnLoading('save-prod-btn',true);setSyncStatus('syncing');
   try{
-    const action=editId?'update':'add';
+    var action=editId?'update':'add';
     await gsWrite(action,'produk',obj,editId);
-    if(editId) db.produk=db.produk.map(x=>String(x.id)===String(editId)?obj:x);
+    if(editId) db.produk=db.produk.map(function(x){return String(x.id)===String(editId)?obj:x;});
     else db.produk.push(obj);
     closeModal('produk');renderProduk();updateDashboard();
     setSyncStatus('ok');showToast(editId?'Produk berhasil diperbarui':'Produk berhasil ditambahkan');
@@ -912,15 +837,15 @@ async function saveProduk(){
 }
 
 async function saveTransaksi(){
-  const tp=document.getElementById('t-prod');
-  const prodName=tp.options[tp.selectedIndex]?tp.options[tp.selectedIndex].getAttribute('data-name')||tp.value:'';
-  const obj={id:editId||genId(),lead:document.getElementById('t-lead').value,prod:prodName||tp.value,camp:document.getElementById('t-camp').value,amount:parseInt(document.getElementById('t-amount').value)||0,status:document.getElementById('t-status').value,date:document.getElementById('t-date').value};
+  var tp=document.getElementById('t-prod');
+  var prodName=tp.options[tp.selectedIndex]?tp.options[tp.selectedIndex].getAttribute('data-name')||tp.value:'';
+  var obj={id:editId||genId(),lead:document.getElementById('t-lead').value,prod:prodName||tp.value,camp:document.getElementById('t-camp').value,amount:parseInt(document.getElementById('t-amount').value)||0,status:document.getElementById('t-status').value,date:document.getElementById('t-date').value};
   if(!obj.lead){alert('Pilih lead terlebih dahulu');return;}
   setBtnLoading('save-trans-btn',true);setSyncStatus('syncing');
   try{
-    const action=editId?'update':'add';
+    var action=editId?'update':'add';
     await gsWrite(action,'transaksi',obj,editId);
-    if(editId) db.transaksi=db.transaksi.map(x=>String(x.id)===String(editId)?obj:x);
+    if(editId) db.transaksi=db.transaksi.map(function(x){return String(x.id)===String(editId)?obj:x;});
     else db.transaksi.push(obj);
     closeModal('transaksi');renderTransaksi();updateDashboard();
     setSyncStatus('ok');showToast(editId?'Transaksi berhasil diperbarui':'Transaksi berhasil ditambahkan');
@@ -928,64 +853,45 @@ async function saveTransaksi(){
   setBtnLoading('save-trans-btn',false);editId=null;
 }
 
-// ============================================================
-// EXPORT CSV
-// ============================================================
 function exportCSV(){
-  const page=document.querySelector('.page.active').id.replace('page-','');
-  let csv='',filename='amansaka_';
-  if(page==='leads'||page==='dashboard'){csv='Nama,Email,Telepon,Perusahaan,Kualitas,Status,Kampanye,Catatan\n'+db.leads.map(l=>[l.name,l.email,l.phone,l.company,l.quality,l.status,l.camp,l.notes].map(v=>`"${v||''}"`).join(',')).join('\n');filename+='leads.csv';}
-  else if(page==='kampanye'){csv='Nama,Tipe,Status,Anggaran,Target,Mulai,Selesai\n'+db.kampanye.map(c=>[c.name,c.type,c.status,isOwner()?c.budget:'***',c.target,c.start,c.end].join(',')).join('\n');filename+='kampanye.csv';}
-  else if(page==='produk'){csv='Nama,Kategori,Harga,Stok,Status,Terjual\n'+db.produk.map(p=>[p.name,p.cat,isOwner()?p.price:'***',p.stock,p.status,p.sold].join(',')).join('\n');filename+='produk.csv';}
-  else if(page==='transaksi'){csv='Lead,Produk,Kampanye,Jumlah,Status,Tanggal\n'+db.transaksi.map(t=>[t.lead,t.prod,t.camp,isOwner()?t.amount:'***',t.status,t.date].join(',')).join('\n');filename+='transaksi.csv';}
-  else if(page==='laporan'){if(!isOwner()){alert('Export laporan hanya untuk Owner.');return;}const s=db.transaksi.filter(t=>t.status==='Sukses');csv='Lead,Produk,Kampanye,Jumlah,Tanggal\n'+s.map(t=>[t.lead,t.prod,t.camp,t.amount,t.date].join(',')).join('\n');filename+='laporan.csv';}
+  var page=document.querySelector('.page.active').id.replace('page-','');
+  var csv='',filename='amansaka_';
+  if(page==='leads'||page==='dashboard'){csv='Nama,Email,Telepon,Perusahaan,Kualitas,Status,Kampanye,Catatan\n'+db.leads.map(function(l){return [l.name,l.email,l.phone,l.company,l.quality,l.status,l.camp,l.notes].map(function(v){return '"'+(v||'')+'"';}).join(',');}).join('\n');filename+='leads.csv';}
+  else if(page==='kampanye'){csv='Nama,Tipe,Status,Anggaran,Target,Mulai,Selesai\n'+db.kampanye.map(function(c){return [c.name,c.type,c.status,isOwner()?c.budget:'***',c.target,c.start,c.end].join(',');}).join('\n');filename+='kampanye.csv';}
+  else if(page==='produk'){csv='Nama,Kategori,Harga,Stok,Status,Terjual\n'+db.produk.map(function(p){return [p.name,p.cat,isOwner()?p.price:'***',p.stock,p.status,p.sold].join(',');}).join('\n');filename+='produk.csv';}
+  else if(page==='transaksi'){csv='Lead,Produk,Kampanye,Jumlah,Status,Tanggal\n'+db.transaksi.map(function(t){return [t.lead,t.prod,t.camp,isOwner()?t.amount:'***',t.status,t.date].join(',');}).join('\n');filename+='transaksi.csv';}
   if(!csv)return;
-  const blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});
-  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=filename;a.click();
+  var blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});
+  var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=filename;a.click();
 }
 
-// ============================================================
-// PRINT
-// ============================================================
-function buildPrintHeader(judul,sub){return`<div class="pr-header"><div class="pr-logo-area"><div class="pr-logo-circle"><span style="color:#d4af37;font-size:20px;font-weight:900;font-family:Georgia,serif">A</span></div><div><div class="pr-brand">AMANSAKA VILLA PARK</div><div class="pr-brand-sub">Marketing Database System</div></div></div><div class="pr-meta"><strong>${judul}</strong>${sub}<br>Dicetak: ${nowStr()}<br>Oleh: ${isOwner()?'Owner':'Marketing'}</div></div>`;}
-function buildPrintFooter(){return`<div class="pr-footer"><span>AMANSAKA VILLA PARK &nbsp;·&nbsp; Marketing Database System</span><span>Halaman 1</span><span>${nowStr()}</span></div>`;}
+function buildPrintHeader(judul,sub){return '<div class="pr-header"><div class="pr-logo-area"><div class="pr-logo-circle"><span style="color:#d4af37;font-size:20px;font-weight:900;font-family:Georgia,serif">A</span></div><div><div class="pr-brand">AMANSAKA VILLA PARK</div><div class="pr-brand-sub">Marketing Database System</div></div></div><div class="pr-meta"><strong>'+judul+'</strong>'+sub+'<br>Dicetak: '+nowStr()+'<br>Oleh: '+(isOwner()?'Owner':'Marketing')+'</div></div>';}
+function buildPrintFooter(){return '<div class="pr-footer"><span>AMANSAKA VILLA PARK &nbsp;·&nbsp; Marketing Database System</span><span>Halaman 1</span><span>'+nowStr()+'</span></div>';}
 
-function buildPrintLeads(){const rows=db.leads;const qc={Hot:0,Warm:0,Cold:0,New:0};rows.forEach(l=>qc[l.quality]=(qc[l.quality]||0)+1);return`${buildPrintHeader('Laporan Kontak / Lead','Semua Data Lead')}<div class="pr-stats"><div class="pr-stat"><div class="pr-stat-label">Total Lead</div><div class="pr-stat-val">${rows.length}</div></div><div class="pr-stat"><div class="pr-stat-label">Hot</div><div class="pr-stat-val" style="color:#991b1b">${qc.Hot}</div></div><div class="pr-stat"><div class="pr-stat-label">Warm</div><div class="pr-stat-val" style="color:#92400e">${qc.Warm}</div></div><div class="pr-stat"><div class="pr-stat-label">Cold</div><div class="pr-stat-val" style="color:#1e40af">${qc.Cold}</div></div><div class="pr-stat"><div class="pr-stat-label">New</div><div class="pr-stat-val" style="color:#5b21b6">${qc.New}</div></div></div><table class="pr-table"><thead><tr><th>#</th><th>Nama</th><th>Email</th><th>Perusahaan</th><th>Kualitas</th><th>Status</th><th>Kampanye</th></tr></thead><tbody>${rows.map((l,i)=>`<tr><td style="color:#999">${i+1}</td><td style="font-weight:600">${l.name}</td><td>${l.email}</td><td>${l.company}</td><td>${prBadge(l.quality)}</td><td>${prBadge(l.status)}</td><td>${l.camp||'—'}</td></tr>`).join('')}</tbody></table>${buildPrintFooter()}`;}
-function buildPrintKampanye(){const rows=db.kampanye;const total=rows.reduce((s,c)=>s+Number(c.budget),0);return`${buildPrintHeader('Laporan Kampanye','Semua Data Kampanye')}<div class="pr-stats"><div class="pr-stat"><div class="pr-stat-label">Total</div><div class="pr-stat-val">${rows.length}</div></div><div class="pr-stat"><div class="pr-stat-label">Aktif</div><div class="pr-stat-val" style="color:#065f46">${rows.filter(c=>c.status==='Aktif').length}</div></div><div class="pr-stat"><div class="pr-stat-label">Total Anggaran</div><div class="pr-stat-val" style="font-size:13px">${isOwner()?'Rp '+fmt(total):'***'}</div></div></div><table class="pr-table"><thead><tr><th>#</th><th>Nama</th><th>Tipe</th><th>Status</th><th>Anggaran</th><th>Target</th><th>Mulai</th><th>Selesai</th></tr></thead><tbody>${rows.map((c,i)=>`<tr><td style="color:#999">${i+1}</td><td style="font-weight:600">${c.name}</td><td>${c.type}</td><td>${prBadge(c.status)}</td><td>${isOwner()?'Rp '+fmt(c.budget):'***'}</td><td>${c.target}</td><td>${c.start}</td><td>${c.end}</td></tr>`).join('')}</tbody></table>${buildPrintFooter()}`;}
-function buildPrintProduk(){const rows=db.produk;const terjual=rows.reduce((s,p)=>s+Number(p.sold),0);return`${buildPrintHeader('Laporan Produk','Semua Data Produk')}<div class="pr-stats"><div class="pr-stat"><div class="pr-stat-label">Total Produk</div><div class="pr-stat-val">${rows.length}</div></div><div class="pr-stat"><div class="pr-stat-label">Total Terjual</div><div class="pr-stat-val">${terjual} unit</div></div></div><table class="pr-table"><thead><tr><th>#</th><th>Nama Produk</th><th>Kategori</th><th>Harga</th><th>Stok</th><th>Status</th><th>Terjual</th></tr></thead><tbody>${rows.map((p,i)=>`<tr><td style="color:#999">${i+1}</td><td style="font-weight:600">${p.name}</td><td>${p.cat}</td><td>${isOwner()?'Rp '+fmt(p.price):'***'}</td><td>${p.stock}</td><td>${prBadge(p.status)}</td><td>${p.sold} unit</td></tr>`).join('')}</tbody></table>${buildPrintFooter()}`;}
-function buildPrintTransaksi(){const rows=db.transaksi;const sukses=rows.filter(t=>t.status==='Sukses');const total=sukses.reduce((s,t)=>s+Number(t.amount),0);return`${buildPrintHeader('Laporan Transaksi','Semua Data Transaksi')}<div class="pr-stats"><div class="pr-stat"><div class="pr-stat-label">Total</div><div class="pr-stat-val">${rows.length}</div></div><div class="pr-stat"><div class="pr-stat-label">Sukses</div><div class="pr-stat-val" style="color:#065f46">${sukses.length}</div></div><div class="pr-stat"><div class="pr-stat-label">Pending</div><div class="pr-stat-val" style="color:#92400e">${rows.filter(t=>t.status==='Pending').length}</div></div>${isOwner()?`<div class="pr-stat"><div class="pr-stat-label">Total Omzet</div><div class="pr-stat-val" style="font-size:12px;color:#065f46">Rp ${fmt(total)}</div></div>`:''}</div><table class="pr-table"><thead><tr><th>#</th><th>Lead</th><th>Produk</th><th>Kampanye</th><th>Jumlah</th><th>Status</th><th>Tanggal</th></tr></thead><tbody>${rows.map((t,i)=>`<tr><td style="color:#999">${i+1}</td><td style="font-weight:600">${t.lead}</td><td>${t.prod}</td><td>${t.camp||'—'}</td><td>${isOwner()?'Rp '+fmt(t.amount):'***'}</td><td>${prBadge(t.status)}</td><td>${t.date}</td></tr>`).join('')}</tbody></table>${buildPrintFooter()}`;}
-function buildPrintLaporan(){if(!isOwner())return`<div style="text-align:center;padding:60px;color:#999"><div style="font-size:36px;margin-bottom:12px">🔒</div><div>Laporan keuangan hanya tersedia untuk Owner</div></div>`;const sukses=db.transaksi.filter(t=>t.status==='Sukses');const totalOmzet=sukses.reduce((s,t)=>s+Number(t.amount),0);const totalAnggaran=db.kampanye.reduce((s,c)=>s+Number(c.budget),0);const roi=totalAnggaran?((totalOmzet/totalAnggaran)*100).toFixed(1):'0';const perProduk={};sukses.forEach(t=>{perProduk[t.prod]=(perProduk[t.prod]||0)+Number(t.amount)});const perKamp={};sukses.forEach(t=>{if(t.camp)perKamp[t.camp]=(perKamp[t.camp]||0)+Number(t.amount)});return`${buildPrintHeader('Laporan Keuangan','Ringkasan Keuangan & Omzet')}<div class="pr-stats"><div class="pr-stat"><div class="pr-stat-label">Total Omzet</div><div class="pr-stat-val" style="color:#065f46">Rp ${fmt(totalOmzet)}</div></div><div class="pr-stat"><div class="pr-stat-label">Total Anggaran</div><div class="pr-stat-val" style="color:#1e40af">Rp ${fmt(totalAnggaran)}</div></div><div class="pr-stat"><div class="pr-stat-label">ROI</div><div class="pr-stat-val" style="color:#92400e">${roi}%</div></div><div class="pr-stat"><div class="pr-stat-label">Transaksi Sukses</div><div class="pr-stat-val">${sukses.length}</div></div></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px"><div><div style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#666;margin-bottom:8px">Omzet per Produk</div><table class="pr-table" style="margin-bottom:0"><thead><tr><th>Produk</th><th>Omzet</th></tr></thead><tbody>${Object.entries(perProduk).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<tr><td>${k}</td><td style="font-weight:700;color:#065f46">Rp ${fmt(v)}</td></tr>`).join('')||'<tr><td colspan="2" style="color:#999">Belum ada data</td></tr>'}</tbody></table></div><div><div style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#666;margin-bottom:8px">Omzet per Kampanye</div><table class="pr-table" style="margin-bottom:0"><thead><tr><th>Kampanye</th><th>Omzet</th></tr></thead><tbody>${Object.entries(perKamp).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<tr><td>${k}</td><td style="font-weight:700;color:#065f46">Rp ${fmt(v)}</td></tr>`).join('')||'<tr><td colspan="2" style="color:#999">Belum ada data</td></tr>'}</tbody></table></div></div>${buildPrintFooter()}`;}
+function buildPrintLeads(){var rows=db.leads;var qc={Hot:0,Warm:0,Cold:0,New:0};rows.forEach(function(l){qc[l.quality]=(qc[l.quality]||0)+1;});return buildPrintHeader('Laporan Kontak / Lead','Semua Data Lead')+'<div class="pr-stats"><div class="pr-stat"><div class="pr-stat-label">Total Lead</div><div class="pr-stat-val">'+rows.length+'</div></div><div class="pr-stat"><div class="pr-stat-label">Hot</div><div class="pr-stat-val" style="color:#991b1b">'+qc.Hot+'</div></div><div class="pr-stat"><div class="pr-stat-label">Warm</div><div class="pr-stat-val" style="color:#92400e">'+qc.Warm+'</div></div><div class="pr-stat"><div class="pr-stat-label">Cold</div><div class="pr-stat-val" style="color:#1e40af">'+qc.Cold+'</div></div><div class="pr-stat"><div class="pr-stat-label">New</div><div class="pr-stat-val" style="color:#5b21b6">'+qc.New+'</div></div></div><table class="pr-table"><thead><tr><th>#</th><th>Nama</th><th>Email</th><th>Perusahaan</th><th>Kualitas</th><th>Status</th><th>Kampanye</th></tr></thead><tbody>'+rows.map(function(l,i){return '<tr><td style="color:#999">'+(i+1)+'</td><td style="font-weight:600">'+l.name+'</td><td>'+l.email+'</td><td>'+l.company+'</td><td>'+prBadge(l.quality)+'</td><td>'+prBadge(l.status)+'</td><td>'+(l.camp||'—')+'</td></tr>';}).join('')+'</tbody></table>'+buildPrintFooter();}
 
-let currentPrintContent='';
+var currentPrintContent='';
 function openPrintPreview(){
-  const page=document.querySelector('.page.active').id.replace('page-','');
-  const labels={dashboard:'Semua Laporan',leads:'Kontak / Lead',kampanye:'Kampanye',produk:'Produk',transaksi:'Transaksi',laporan:'Laporan Keuangan'};
+  var page=document.querySelector('.page.active').id.replace('page-','');
+  var labels={dashboard:'Semua Laporan',leads:'Kontak / Lead',kampanye:'Kampanye',produk:'Produk',transaksi:'Transaksi',laporan:'Laporan Keuangan'};
   document.getElementById('preview-title-bar').textContent='Preview Cetak — '+labels[page];
-  let html='';
-  if(page==='dashboard'){html=buildPrintLeads()+'<div style="height:40px;border-top:2px dashed #e0e0e0;margin:32px 0"></div>'+buildPrintKampanye()+'<div style="height:40px;border-top:2px dashed #e0e0e0;margin:32px 0"></div>'+buildPrintProduk()+'<div style="height:40px;border-top:2px dashed #e0e0e0;margin:32px 0"></div>'+buildPrintTransaksi();}
-  else if(page==='leads')html=buildPrintLeads();
-  else if(page==='kampanye')html=buildPrintKampanye();
-  else if(page==='produk')html=buildPrintProduk();
-  else if(page==='transaksi')html=buildPrintTransaksi();
-  else if(page==='laporan')html=buildPrintLaporan();
+  var html='';
+  if(page==='leads'||page==='dashboard') html=buildPrintLeads();
   currentPrintContent=html;
   document.getElementById('preview-page-content').innerHTML=html;
   document.getElementById('preview-bg').classList.add('open');
 }
-function closePrintPreview(){document.getElementById('preview-bg').classList.remove('open')}
+function closePrintPreview(){document.getElementById('preview-bg').classList.remove('open');}
 function doPrint(){
-  const w=window.open('','_blank','width=900,height=700');
-  w.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Laporan AMANSAKA VILLA PARK</title><style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:'Trebuchet MS',Arial,sans-serif;color:#1a1a1a;background:#fff;padding:0}@page{margin:20mm 18mm}.pr-header{display:flex;align-items:center;justify-content:space-between;border-bottom:2.5px solid #0c2340;padding-bottom:16px;margin-bottom:20px}.pr-logo-area{display:flex;align-items:center;gap:12px}.pr-logo-circle{width:50px;height:50px;border-radius:50%;background:#0c2340;display:flex;align-items:center;justify-content:center}.pr-brand{font-size:16px;font-weight:700;letter-spacing:2px;color:#0c2340;text-transform:uppercase}.pr-brand-sub{font-size:9px;letter-spacing:1.5px;color:#b8960c;text-transform:uppercase;margin-top:1px}.pr-meta{text-align:right;font-size:11px;color:#555}.pr-meta strong{display:block;font-size:14px;color:#0c2340;font-weight:700;margin-bottom:2px}.pr-stats{display:flex;gap:12px;margin-bottom:20px}.pr-stat{flex:1;background:#f4f7fb;border-radius:8px;padding:12px 14px;border-left:3px solid #0c2340}.pr-stat-label{font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#666;margin-bottom:3px}.pr-stat-val{font-size:18px;font-weight:700;color:#0c2340}.pr-table{width:100%;border-collapse:collapse;font-size:11px;margin-bottom:16px}.pr-table th{background:#0c2340;color:#d4af37;padding:8px 10px;text-align:left;font-size:9px;font-weight:700;letter-spacing:0.8px;text-transform:uppercase}.pr-table td{padding:7px 10px;border-bottom:1px solid #eee;color:#222}.pr-table tr:nth-child(even) td{background:#f9fafb}.pr-badge{display:inline-block;padding:1px 7px;border-radius:8px;font-size:9px;font-weight:700}.pr-footer{margin-top:32px;padding-top:12px;border-top:1px solid #ddd;display:flex;justify-content:space-between;font-size:9px;color:#aaa}.page-break{page-break-before:always;padding-top:20px}</style></head><body>${currentPrintContent.replace(/<div style="height:40px;border-top:2px dashed #e0e0e0;margin:32px 0"><\/div>/g,'<div class="page-break"></div>')}</body></html>`);
+  var w=window.open('','_blank','width=900,height=700');
+  w.document.write('<!DOCTYPE html><html><head><meta charset="utf-8"><title>Laporan AMANSAKA</title><style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:"Trebuchet MS",Arial,sans-serif;color:#1a1a1a;background:#fff;padding:20px}.pr-header{display:flex;align-items:center;justify-content:space-between;border-bottom:2.5px solid #0c2340;padding-bottom:16px;margin-bottom:20px}.pr-logo-circle{width:50px;height:50px;border-radius:50%;background:#0c2340;display:flex;align-items:center;justify-content:center}.pr-brand{font-size:16px;font-weight:700;letter-spacing:2px;color:#0c2340;text-transform:uppercase}.pr-brand-sub{font-size:9px;letter-spacing:1.5px;color:#b8960c;text-transform:uppercase}.pr-meta{text-align:right;font-size:11px;color:#555}.pr-meta strong{display:block;font-size:14px;color:#0c2340;font-weight:700}.pr-stats{display:flex;gap:12px;margin-bottom:20px}.pr-stat{flex:1;background:#f4f7fb;border-radius:8px;padding:12px 14px;border-left:3px solid #0c2340}.pr-stat-label{font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#666}.pr-stat-val{font-size:18px;font-weight:700;color:#0c2340}.pr-table{width:100%;border-collapse:collapse;font-size:11px}.pr-table th{background:#0c2340;color:#d4af37;padding:8px 10px;text-align:left;font-size:9px;font-weight:700;text-transform:uppercase}.pr-table td{padding:7px 10px;border-bottom:1px solid #eee}.pr-badge{display:inline-block;padding:1px 7px;border-radius:8px;font-size:9px;font-weight:700}.pr-footer{margin-top:32px;padding-top:12px;border-top:1px solid #ddd;display:flex;justify-content:space-between;font-size:9px;color:#aaa}</style></head><body>'+currentPrintContent+'</body></html>');
   w.document.close();
-  setTimeout(()=>{w.print();},600);
+  setTimeout(function(){w.print();},600);
 }
 
-// ============================================================
-// INIT
-// ============================================================
-document.querySelectorAll('.modal-bg, .preview-bg').forEach(m =>
-  m.addEventListener('click', function(e){if(e.target===this)this.classList.remove('open')})
-);
+document.querySelectorAll('.modal-bg, .preview-bg').forEach(function(m){
+  m.addEventListener('click', function(e){if(e.target===this)this.classList.remove('open');});
+});
 </script>
 </body>
 </html>
