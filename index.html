@@ -171,6 +171,62 @@ footer{background:#0c2340;color:rgba(255,255,255,0.7);padding:12px 24px;display:
 .spinner{width:36px;height:36px;border:3px solid #e0e0e0;border-top-color:#0c2340;border-radius:50%;animation:spin 0.8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 .loading-text{font-size:13px;font-weight:600;color:#0c2340}
+
+/* RESPONSIVE MOBILE */
+@media (max-width:768px){
+  body{font-size:13px}
+  .login-box{width:92vw;padding:28px 20px}
+  .login-brand{font-size:15px}
+  .app-wrap{flex-direction:row}
+  .sidebar{width:48px;overflow:hidden;transition:width 0.25s}
+  .sidebar.expanded{width:200px;z-index:100}
+  .sidebar-logo{padding:10px 8px;display:flex;align-items:center;justify-content:center}
+  .sidebar-brand{display:none}
+  .sidebar.expanded .sidebar-brand{display:block;font-size:11px}
+  .sidebar-role{display:none}
+  .sidebar.expanded .sidebar-role{display:inline-block}
+  .nav-label{display:none}
+  .sidebar.expanded .nav-label{display:block}
+  .nav-item{padding:11px 0;justify-content:center;gap:0}
+  .sidebar.expanded .nav-item{padding:9px 12px;justify-content:flex-start;gap:9px}
+  .nav-item span:not(.nav-icon){display:none}
+  .sidebar.expanded .nav-item span:not(.nav-icon){display:inline}
+  .lock-badge{display:none}
+  .nav-icon{font-size:17px;width:48px;text-align:center}
+  .sidebar.expanded .nav-icon{width:16px}
+  .sidebar > div:last-child{padding:8px 0}
+  .topbar{padding:0 8px;height:46px}
+  .page-title{font-size:12px;font-weight:700}
+  .sync-indicator{display:none}
+  .user-chip{padding:4px 7px;font-size:10px}
+  .btn{padding:5px 8px;font-size:11px}
+  .content{padding:10px 8px}
+  .stat-grid{grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:10px}
+  .stat-val{font-size:17px}
+  .stat-label{font-size:9px}
+  .section-row{grid-template-columns:1fr;gap:10px}
+  .toolbar{gap:5px}
+  .search-box{min-width:90px;font-size:11px;padding:6px 8px}
+  select.filter-sel{font-size:11px;padding:6px 5px}
+  .btn-navy{font-size:11px;padding:6px 8px}
+  th{font-size:9px;padding:7px 5px;letter-spacing:0}
+  td{font-size:11px;padding:7px 5px}
+  .modal{width:96vw;padding:16px;max-height:88vh}
+  .modal h2{font-size:13px;margin-bottom:12px}
+  .form-grid{grid-template-columns:1fr;gap:8px}
+  .form-group.full{grid-column:1}
+  input.form-input,select.form-input,textarea.form-input{font-size:12px;padding:7px 8px}
+  .card{padding:11px}
+  footer{padding:8px 10px}
+  .footer-tagline{display:none}
+  .preview-shell{width:99vw}
+  .preview-page{width:100%;min-height:auto;padding:16px}
+  .toast{bottom:12px;right:12px;left:12px;text-align:center}
+}
+@media (max-width:480px){
+  .stat-grid{grid-template-columns:repeat(2,1fr)}
+  .topbar-right .btn:not(.btn-print){display:none}
+}
 </style>
 </head>
 <body>
@@ -232,7 +288,10 @@ footer{background:#0c2340;color:rgba(255,255,255,0.7);padding:12px 24px;display:
 
     <div class="main">
       <div class="topbar">
-        <div class="page-title" id="page-title">Dashboard</div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <button id="sidebar-toggle" onclick="toggleSidebar()" style="display:none;background:none;border:none;cursor:pointer;font-size:20px;color:#0c2340;padding:4px 6px;line-height:1">☰</button>
+          <div class="page-title" id="page-title">Dashboard</div>
+        </div>
         <div class="topbar-right">
           <div class="sync-indicator"><div class="sync-dot" id="sync-dot"></div><span id="sync-label">Tersinkron</span></div>
           <div class="user-chip"><div class="user-dot" id="user-dot" style="background:#d4af37"></div><span id="user-label">Owner</span></div>
@@ -638,7 +697,7 @@ function renderKampanye() {
   if(!rows.length){tbody.innerHTML='<tr class="empty-row"><td colspan="8">Tidak ada data ditemukan</td></tr>';return;}
   tbody.innerHTML = rows.map(function(c){
     var lc = db.leads.filter(function(l){return l.camp===c.name;}).length;
-    return '<tr><td>'+c.name+'</td><td>'+c.type+'</td><td>'+statusBadge(c.status)+'</td><td>'+(isOwner()?'Rp '+fmt(c.budget):'<span class="omzet-blur">Rp '+fmt(c.budget)+'</span>')+'</td><td>'+lc+'</td><td>'+c.start+'</td><td>'+c.end+'</td><td><div class="td-action"><button class="icon-btn" onclick="editKampanye(\''+c.id+'\')">✎</button><button class="icon-btn" '+(isOwner()?'onclick="delItem(\'kampanye\',\''+c.id+'\')"':'disabled')+' title="Hapus">✕</button></div></td></tr>';
+    return '<tr><td>'+c.name+'</td><td>'+c.type+'</td><td>'+statusBadge(c.status)+'</td><td>Rp '+fmt(c.budget)+'</td><td>'+lc+'</td><td>'+c.start+'</td><td>'+c.end+'</td><td><div class="td-action"><button class="icon-btn" onclick="editKampanye(\''+c.id+'\')">✎</button><button class="icon-btn" '+(isOwner()?'onclick="delItem(\'kampanye\',\''+c.id+'\')"':'disabled')+' title="Hapus">✕</button></div></td></tr>';
   }).join('');
 }
 
@@ -857,7 +916,7 @@ function exportCSV(){
   var page=document.querySelector('.page.active').id.replace('page-','');
   var csv='',filename='amansaka_';
   if(page==='leads'||page==='dashboard'){csv='Nama,Email,Telepon,Perusahaan,Kualitas,Status,Kampanye,Catatan\n'+db.leads.map(function(l){return [l.name,l.email,l.phone,l.company,l.quality,l.status,l.camp,l.notes].map(function(v){return '"'+(v||'')+'"';}).join(',');}).join('\n');filename+='leads.csv';}
-  else if(page==='kampanye'){csv='Nama,Tipe,Status,Anggaran,Target,Mulai,Selesai\n'+db.kampanye.map(function(c){return [c.name,c.type,c.status,isOwner()?c.budget:'***',c.target,c.start,c.end].join(',');}).join('\n');filename+='kampanye.csv';}
+  else if(page==='kampanye'){csv='Nama,Tipe,Status,Anggaran,Target,Mulai,Selesai\n'+db.kampanye.map(function(c){return [c.name,c.type,c.status,c.budget,c.target,c.start,c.end].join(',');}).join('\n');filename+='kampanye.csv';}
   else if(page==='produk'){csv='Nama,Kategori,Harga,Stok,Status,Terjual\n'+db.produk.map(function(p){return [p.name,p.cat,isOwner()?p.price:'***',p.stock,p.status,p.sold].join(',');}).join('\n');filename+='produk.csv';}
   else if(page==='transaksi'){csv='Lead,Produk,Kampanye,Jumlah,Status,Tanggal\n'+db.transaksi.map(function(t){return [t.lead,t.prod,t.camp,isOwner()?t.amount:'***',t.status,t.date].join(',');}).join('\n');filename+='transaksi.csv';}
   if(!csv)return;
@@ -888,6 +947,17 @@ function doPrint(){
   w.document.close();
   setTimeout(function(){w.print();},600);
 }
+
+function toggleSidebar(){
+  document.querySelector('.sidebar').classList.toggle('expanded');
+}
+function initMobile(){
+  var isMobile = window.innerWidth <= 768;
+  var btn = document.getElementById('sidebar-toggle');
+  if(btn) btn.style.display = isMobile ? 'block' : 'none';
+}
+window.addEventListener('resize', initMobile);
+initMobile();
 
 document.querySelectorAll('.modal-bg, .preview-bg').forEach(function(m){
   m.addEventListener('click', function(e){if(e.target===this)this.classList.remove('open');});
