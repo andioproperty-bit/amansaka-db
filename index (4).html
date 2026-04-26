@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AMANSAKA VILLA PARK — Marketing Database</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Trebuchet MS',sans-serif;background:#f0f2f5;color:#1a1a2e;font-size:14px;min-height:100vh;display:flex;flex-direction:column}
+:root{--navy:#0c2340;--navy2:#163352;--navy3:#1e4470;--gold:#b8960c;--gold2:#d4af37;--gold3:#f0d060}
+
+/* LOGIN */
+#login-screen{flex:1;display:flex;align-items:center;justify-content:center;min-height:100vh;background:linear-gradient(135deg,#0c2340 0%,#1e4470 60%,#0c2340 100%)}
+.login-box{background:#fff;border-radius:16px;padding:40px 36px;width:380px;box-shadow:0 20px 60px rgba(0,0,0,0.4);text-align:center}
+.logo-circle{width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,#0c2340,#1e4470);display:inline-flex;align-items:center;justify-content:center;margin-bottom:8px;box-shadow:0 4px 16px rgba(12,35,64,0.3)}
+.logo-v{color:#d4af37;font-size:28px;font-weight:900;font-family:Georgia,serif}
+.login-brand{font-size:18px;font-weight:700;letter-spacing:2px;color:#0c2340;text-transform:uppercase}
+.login-sub{font-size:10px;letter-spacing:3px;color:#b8960c;text-transform:uppercase;margin-bottom:24px}
+.role-tabs{display:flex;border:1.5px solid #d4af37;border-radius:8px;overflow:hidden;margin-bottom:20px}
+.role-tab{flex:1;padding:9px;font-size:12px;font-weight:600;cursor:pointer;border:none;background:transparent;color:#888;transition:all 0.2s}
+.role-tab.active{background:#0c2340;color:#d4af37}
+.login-field{width:100%;padding:11px 14px;border-radius:8px;border:1.5px solid #e0e0e0;font-size:13px;margin-bottom:12px;font-family:inherit;color:#333;background:#fafafa}
+.login-field:focus{outline:none;border-color:#1e4470}
+.login-btn{width:100%;padding:12px;background:linear-gradient(135deg,#0c2340,#1e4470);color:#d4af37;border:none;border-radius:8px;font-size:13px;font-weight:700;letter-spacing:1px;cursor:pointer;text-transform:uppercase}
+.login-btn:hover{opacity:0.9}
+.login-err{color:#dc2626;font-size:12px;margin-top:8px;display:none}
+
+/* APP */
+#app-screen{display:none;flex:1;flex-direction:column;min-height:100vh}
+.app-wrap{display:flex;flex:1;min-height:0}
+.sidebar{width:220px;background:#0c2340;color:#fff;display:flex;flex-direction:column;flex-shrink:0}
+.sidebar-logo{padding:18px 16px 14px;border-bottom:1px solid rgba(212,175,55,0.2)}
+.sidebar-brand{font-size:13px;font-weight:700;letter-spacing:1.5px;color:#f0d060;text-transform:uppercase}
+.sidebar-role{display:inline-block;margin-top:4px;font-size:9px;letter-spacing:1px;padding:2px 8px;border-radius:10px;text-transform:uppercase;font-weight:600}
+.role-owner{background:rgba(212,175,55,0.2);color:#d4af37}
+.role-marketing{background:rgba(99,179,237,0.2);color:#90cdf4}
+.nav-section{padding:10px 0}
+.nav-label{font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.3);padding:0 16px 5px}
+.nav-item{display:flex;align-items:center;gap:9px;padding:9px 16px;cursor:pointer;font-size:12px;color:rgba(255,255,255,0.6);transition:all 0.15s;border-left:2px solid transparent}
+.nav-item:hover{background:rgba(255,255,255,0.06);color:#fff}
+.nav-item.active{background:rgba(212,175,55,0.12);color:#f0d060;border-left-color:#d4af37}
+.nav-icon{font-size:13px;width:16px;text-align:center}
+.lock-badge{font-size:9px;margin-left:auto;background:rgba(212,175,55,0.2);color:#d4af37;padding:1px 5px;border-radius:6px}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.topbar{background:#fff;border-bottom:1px solid #e8eaf0;padding:0 20px;height:52px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.page-title{font-size:15px;font-weight:700;color:#1a1a2e}
+.topbar-right{display:flex;align-items:center;gap:8px}
+.user-chip{display:flex;align-items:center;gap:6px;padding:5px 10px;border-radius:20px;background:#f0f2f5;font-size:11px;font-weight:600;color:#666}
+.user-dot{width:8px;height:8px;border-radius:50%}
+.sync-indicator{display:flex;align-items:center;gap:5px;font-size:11px;padding:5px 10px;border-radius:20px;background:#f0f2f5;color:#666}
+.sync-dot{width:7px;height:7px;border-radius:50%;background:#10b981}
+.sync-dot.syncing{background:#f59e0b;animation:pulse 1s infinite}
+.sync-dot.error{background:#ef4444}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+.btn{padding:6px 12px;border-radius:6px;font-size:12px;cursor:pointer;font-weight:600;border:1px solid #ddd;background:#fff;color:#333;transition:all 0.15s}
+.btn:hover{background:#f5f5f5}
+.btn-navy{background:#0c2340;color:#d4af37;border-color:#0c2340}
+.btn-navy:hover{background:#163352}
+.btn-print{background:#065f46;color:#fff;border-color:#065f46}
+.btn-print:hover{background:#047857}
+.btn-danger{background:#fee2e2;color:#991b1b;border-color:#fca5a5}
+.content{flex:1;overflow-y:auto;padding:18px 22px}
+.page{display:none}.page.active{display:block}
+
+/* CARDS & TABLES */
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}
+.stat-card{background:#fff;border:1px solid #e8eaf0;border-radius:10px;padding:14px 16px}
+.stat-label{font-size:10px;letter-spacing:0.8px;text-transform:uppercase;color:#888;margin-bottom:4px}
+.stat-val{font-size:22px;font-weight:700;color:#1a1a2e}
+.stat-sub{font-size:11px;color:#888;margin-top:2px}
+.locked-overlay{position:relative}
+.locked-overlay::after{content:"🔒 Akses Owner";position:absolute;inset:0;background:rgba(12,35,64,0.06);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#0c2340;border-radius:10px;pointer-events:none}
+.section-row{display:grid;grid-template-columns:1.5fr 1fr;gap:16px;margin-bottom:16px}
+.card{background:#fff;border:1px solid #e8eaf0;border-radius:10px;padding:16px}
+.card-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:#888;margin-bottom:12px}
+.toolbar{display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.search-box{flex:1;min-width:150px;padding:7px 12px;border-radius:6px;border:1px solid #ddd;background:#f9fafb;color:#333;font-size:12px}
+.search-box:focus{outline:none;border-color:#0c2340;background:#fff}
+select.filter-sel{padding:7px 10px;border-radius:6px;border:1px solid #ddd;background:#f9fafb;color:#333;font-size:12px;cursor:pointer}
+.table-wrap{overflow-x:auto;border-radius:8px;border:1px solid #e8eaf0}
+table{width:100%;border-collapse:collapse;background:#fff;table-layout:fixed}
+th{background:#f5f7fb;font-size:10px;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;color:#888;padding:9px 12px;text-align:left;border-bottom:1px solid #e8eaf0}
+td{padding:9px 12px;font-size:12px;border-bottom:1px solid #f0f2f5;color:#333;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#fafbff}
+.badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700}
+.badge-hot{background:#fee2e2;color:#991b1b}
+.badge-warm{background:#fef3c7;color:#92400e}
+.badge-cold{background:#dbeafe;color:#1e40af}
+.badge-new{background:#ede9fe;color:#5b21b6}
+.badge-active{background:#d1fae5;color:#065f46}
+.badge-inactive{background:#f3f4f6;color:#6b7280}
+.badge-closed{background:#fce7f3;color:#9d174d}
+.badge-paused{background:#f9fafb;color:#374151;border:1px solid #e5e7eb}
+.td-action{display:flex;gap:4px}
+.icon-btn{width:26px;height:26px;border-radius:5px;border:1px solid #e8eaf0;background:transparent;cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;color:#888}
+.icon-btn:hover{background:#f5f5f5;color:#333}
+.icon-btn:disabled{opacity:0.3;cursor:not-allowed}
+
+/* MODAL */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:200;align-items:center;justify-content:center}
+.modal-bg.open{display:flex}
+.modal{background:#fff;border-radius:12px;padding:24px;width:480px;max-width:95vw;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.2)}
+.modal h2{font-size:15px;font-weight:700;margin-bottom:16px;color:#1a1a2e}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+.form-group{display:flex;flex-direction:column;gap:4px}
+.form-group.full{grid-column:1/-1}
+label.form-label{font-size:11px;font-weight:600;color:#666}
+input.form-input,select.form-input,textarea.form-input{padding:8px 10px;border-radius:6px;border:1px solid #ddd;background:#f9fafb;color:#333;font-size:13px;font-family:inherit}
+input.form-input:focus,select.form-input:focus,textarea.form-input:focus{outline:none;border-color:#0c2340;background:#fff}
+.modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:20px}
+
+/* PRINT PREVIEW */
+.preview-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:300;align-items:flex-start;justify-content:center;overflow-y:auto;padding:20px}
+.preview-bg.open{display:flex}
+.preview-shell{background:#e0e0e0;border-radius:12px;width:820px;max-width:98vw;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,0.5)}
+.preview-topbar{background:#2d2d2d;padding:12px 20px;display:flex;align-items:center;justify-content:space-between}
+.preview-topbar-title{color:#fff;font-size:13px;font-weight:600}
+.preview-topbar-actions{display:flex;gap:8px}
+.prev-btn{padding:6px 14px;border-radius:6px;border:none;background:rgba(255,255,255,0.1);color:#fff;font-size:12px;cursor:pointer;font-weight:500}
+.prev-btn:hover{background:rgba(255,255,255,0.2)}
+.prev-print-btn{padding:6px 16px;border-radius:6px;border:none;background:#065f46;color:#fff;font-size:12px;cursor:pointer;font-weight:700}
+.prev-print-btn:hover{background:#047857}
+.preview-page-wrap{padding:20px;display:flex;justify-content:center}
+.preview-page{background:#fff;width:760px;min-height:1040px;box-shadow:0 4px 24px rgba(0,0,0,0.15);padding:44px 52px;font-family:'Trebuchet MS',Arial,sans-serif;color:#1a1a1a}
+.pr-header{display:flex;align-items:center;justify-content:space-between;border-bottom:2.5px solid #0c2340;padding-bottom:16px;margin-bottom:20px}
+.pr-logo-area{display:flex;align-items:center;gap:12px}
+.pr-logo-circle{width:50px;height:50px;border-radius:50%;background:#0c2340;display:flex;align-items:center;justify-content:center}
+.pr-brand{font-size:16px;font-weight:700;letter-spacing:2px;color:#0c2340;text-transform:uppercase}
+.pr-brand-sub{font-size:9px;letter-spacing:1.5px;color:#b8960c;text-transform:uppercase;margin-top:1px}
+.pr-meta{text-align:right;font-size:11px;color:#555}
+.pr-meta strong{display:block;font-size:14px;color:#0c2340;font-weight:700;margin-bottom:2px}
+.pr-stats{display:flex;gap:12px;margin-bottom:20px}
+.pr-stat{flex:1;background:#f4f7fb;border-radius:8px;padding:12px 14px;border-left:3px solid #0c2340}
+.pr-stat-label{font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#666;margin-bottom:3px}
+.pr-stat-val{font-size:18px;font-weight:700;color:#0c2340}
+.pr-table{width:100%;border-collapse:collapse;font-size:11px;margin-bottom:16px}
+.pr-table th{background:#0c2340;color:#d4af37;padding:8px 10px;text-align:left;font-size:9px;font-weight:700;letter-spacing:0.8px;text-transform:uppercase}
+.pr-table td{padding:7px 10px;border-bottom:1px solid #eee;color:#222}
+.pr-table tr:nth-child(even) td{background:#f9fafb}
+.pr-badge{display:inline-block;padding:1px 7px;border-radius:8px;font-size:9px;font-weight:700}
+.pr-footer{margin-top:32px;padding-top:12px;border-top:1px solid #ddd;display:flex;justify-content:space-between;font-size:9px;color:#aaa}
+
+/* MISC */
+.mini-list{list-style:none}
+.mini-list li{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid #f0f2f5;font-size:12px}
+.mini-list li:last-child{border-bottom:none}
+.chart-bar-row{display:flex;align-items:center;gap:8px;margin-bottom:7px}
+.chart-bar-label{width:58px;font-size:11px;color:#888;text-align:right;flex-shrink:0}
+.chart-bar-track{flex:1;height:15px;background:#f0f2f5;border-radius:4px;overflow:hidden}
+.chart-bar-fill{height:100%;border-radius:4px}
+.chart-bar-val{width:28px;font-size:11px;font-weight:700;color:#333}
+.empty-row td{text-align:center;color:#aaa;padding:32px;font-size:12px}
+.omzet-blur{filter:blur(5px);user-select:none}
+.access-denied{background:#f9fafb;border:1px solid #e8eaf0;border-radius:10px;padding:48px;text-align:center}
+.toast{position:fixed;bottom:24px;right:24px;background:#1a1a2e;color:#fff;padding:10px 18px;border-radius:8px;font-size:12px;font-weight:600;z-index:9999;opacity:0;transition:opacity 0.3s;pointer-events:none}
+.toast.show{opacity:1}
+.toast.success{background:#065f46}
+.toast.error{background:#991b1b}
+
+/* FOOTER */
+footer{background:#0c2340;color:rgba(255,255,255,0.7);padding:12px 24px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;border-top:1px solid rgba(212,175,55,0.3)}
+.footer-logo-mini{width:30px;height:30px;border-radius:50%;background:rgba(212,175,55,0.15);border:1px solid rgba(212,175,55,0.4);display:flex;align-items:center;justify-content:center}
+.footer-logo-mini span{color:#d4af37;font-size:12px;font-weight:900;font-family:Georgia,serif}
+.footer-brand{font-size:11px;font-weight:700;letter-spacing:2px;color:#d4af37;text-transform:uppercase}
+.footer-tagline{font-size:9px;letter-spacing:1px;color:rgba(255,255,255,0.35);text-transform:uppercase}
+
+/* LOADING OVERLAY */
+.loading-overlay{display:none;position:fixed;inset:0;background:rgba(255,255,255,0.85);z-index:500;align-items:center;justify-content:center;flex-direction:column;gap:12px}
+.loading-overlay.show{display:flex}
+.spinner{width:36px;height:36px;border:3px solid #e0e0e0;border-top-color:#0c2340;border-radius:50%;animation:spin 0.8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-text{font-size:13px;font-weight:600;color:#0c2340}
+</style>
+</head>
+<body>
+
+<!-- LOADING -->
+<div class="loading-overlay" id="loading-overlay">
+  <div class="spinner"></div>
+  <div class="loading-text" id="loading-text">Memuat data...</div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="logo-circle"><span class="logo-v">A</span></div>
+    <div class="login-brand">Amansaka Villa Park</div>
+    <div class="login-sub">Marketing Database System</div>
+    <div class="role-tabs">
+      <button class="role-tab active" onclick="selectRole('owner',this)">Owner</button>
+      <button class="role-tab" onclick="selectRole('marketing',this)">Marketing</button>
+    </div>
+    <input class="login-field" type="password" id="login-pass" placeholder="Masukkan password..." onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="login-btn" onclick="doLogin()">Masuk</button>
+    <div class="login-err" id="login-err">Password salah. Coba lagi.</div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app-screen">
+  <div class="app-wrap">
+    <div class="sidebar">
+      <div class="sidebar-logo">
+        <div class="sidebar-brand">Amansaka</div>
+        <span class="sidebar-role" id="role-badge">Owner</span>
+      </div>
+      <div class="nav-section">
+        <div class="nav-label">Utama</div>
+        <div class="nav-item active" onclick="showPage('dashboard',this)"><span class="nav-icon">▦</span>Dashboard</div>
+      </div>
+      <div class="nav-section">
+        <div class="nav-label">Data Marketing</div>
+        <div class="nav-item" onclick="showPage('leads',this)"><span class="nav-icon">◉</span>Kontak / Lead</div>
+        <div class="nav-item" onclick="showPage('kampanye',this)"><span class="nav-icon">⚑</span>Kampanye</div>
+        <div class="nav-item" onclick="showPage('produk',this)"><span class="nav-icon">▣</span>Produk</div>
+        <div class="nav-item" onclick="showPage('transaksi',this)"><span class="nav-icon">↔</span>Transaksi</div>
+      </div>
+      <div class="nav-section" id="nav-owner-section">
+        <div class="nav-label">Owner Only</div>
+        <div class="nav-item" onclick="showPage('laporan',this)"><span class="nav-icon">$</span>Laporan Keuangan<span class="lock-badge">Owner</span></div>
+      </div>
+      <div style="flex:1"></div>
+      <div style="padding:12px 16px;border-top:1px solid rgba(255,255,255,0.08)">
+        <div class="nav-item" onclick="refreshAll()" style="color:rgba(100,200,150,0.8);border-left:none"><span class="nav-icon">↺</span>Sinkronisasi</div>
+        <div class="nav-item" onclick="logout()" style="color:rgba(255,100,100,0.7);border-left:none"><span class="nav-icon">⏻</span>Keluar</div>
+      </div>
+    </div>
+
+    <div class="main">
+      <div class="topbar">
+        <div class="page-title" id="page-title">Dashboard</div>
+        <div class="topbar-right">
+          <div class="sync-indicator"><div class="sync-dot" id="sync-dot"></div><span id="sync-label">Tersinkron</span></div>
+          <div class="user-chip"><div class="user-dot" id="user-dot" style="background:#d4af37"></div><span id="user-label">Owner</span></div>
+          <button class="btn btn-print" onclick="openPrintPreview()">🖨 Cetak</button>
+          <button class="btn" onclick="exportCSV()">⬇ CSV</button>
+        </div>
+      </div>
+
+      <div class="content">
+
+<!-- DASHBOARD -->
+<div class="page active" id="page-dashboard">
+  <div class="stat-grid">
+    <div class="stat-card"><div class="stat-label">Total Lead</div><div class="stat-val" id="d-leads">—</div><div class="stat-sub">dalam pipeline</div></div>
+    <div class="stat-card"><div class="stat-label">Kampanye Aktif</div><div class="stat-val" id="d-camp">—</div><div class="stat-sub">sedang berjalan</div></div>
+    <div class="stat-card"><div class="stat-label">Total Produk</div><div class="stat-val" id="d-prod">—</div><div class="stat-sub">terdaftar</div></div>
+    <div class="stat-card" id="stat-omzet"><div class="stat-label">Total Omzet</div><div class="stat-val" id="d-omzet">—</div><div class="stat-sub" id="d-trans-count">— transaksi sukses</div></div>
+  </div>
+  <div class="section-row">
+    <div class="card"><div class="card-title">Distribusi Kualitas Lead</div><div id="lead-quality-chart"><div style="color:#aaa;font-size:12px">Memuat...</div></div></div>
+    <div class="card"><div class="card-title">Transaksi Terbaru</div><ul class="mini-list" id="recent-trans"><li><span style="color:#aaa">Memuat...</span></li></ul></div>
+  </div>
+  <div class="section-row">
+    <div class="card"><div class="card-title">Lead Terbaru</div><ul class="mini-list" id="recent-leads"><li><span style="color:#aaa">Memuat...</span></li></ul></div>
+    <div class="card"><div class="card-title">Kampanye Berjalan</div><ul class="mini-list" id="active-camps"><li><span style="color:#aaa">Memuat...</span></li></ul></div>
+  </div>
+</div>
+
+<!-- LEADS -->
+<div class="page" id="page-leads">
+  <div class="toolbar">
+    <input class="search-box" placeholder="Cari nama, email, perusahaan..." oninput="renderLeads()" id="lead-search">
+    <select class="filter-sel" onchange="renderLeads()" id="lead-filter-quality"><option value="">Semua Kualitas</option><option>Hot</option><option>Warm</option><option>Cold</option><option>New</option></select>
+    <select class="filter-sel" onchange="renderLeads()" id="lead-filter-status"><option value="">Semua Status</option><option>Aktif</option><option>Tidak Aktif</option><option>Closed</option></select>
+    <button class="btn btn-navy" onclick="openModal('lead')">+ Tambah Lead</button>
+  </div>
+  <div class="table-wrap"><table><thead><tr>
+    <th style="width:140px">Nama</th><th style="width:165px">Email</th><th style="width:115px">Perusahaan</th>
+    <th style="width:76px">Kualitas</th><th style="width:78px">Status</th><th style="width:115px">Kampanye</th><th style="width:76px">Aksi</th>
+  </tr></thead><tbody id="lead-table"><tr class="empty-row"><td colspan="7">Memuat data...</td></tr></tbody></table></div>
+</div>
+
+<!-- KAMPANYE -->
+<div class="page" id="page-kampanye">
+  <div class="toolbar">
+    <input class="search-box" placeholder="Cari nama kampanye..." oninput="renderKampanye()" id="camp-search">
+    <select class="filter-sel" onchange="renderKampanye()" id="camp-filter"><option value="">Semua Status</option><option>Aktif</option><option>Paused</option><option>Selesai</option></select>
+    <button class="btn btn-navy" onclick="openModal('kampanye')">+ Tambah Kampanye</button>
+  </div>
+  <div class="table-wrap"><table><thead><tr>
+    <th style="width:148px">Nama</th><th style="width:86px">Tipe</th><th style="width:75px">Status</th>
+    <th style="width:105px">Anggaran</th><th style="width:60px">Lead</th><th style="width:90px">Mulai</th><th style="width:90px">Selesai</th><th style="width:68px">Aksi</th>
+  </tr></thead><tbody id="camp-table"><tr class="empty-row"><td colspan="8">Memuat data...</td></tr></tbody></table></div>
+</div>
+
+<!-- PRODUK -->
+<div class="page" id="page-produk">
+  <div class="toolbar">
+    <input class="search-box" placeholder="Cari produk..." oninput="renderProduk()" id="prod-search">
+    <select class="filter-sel" onchange="renderProduk()" id="prod-filter"><option value="">Semua Kategori</option><option>Fisik</option><option>Digital</option><option>Layanan</option></select>
+    <button class="btn btn-navy" onclick="openModal('produk')">+ Tambah Produk</button>
+  </div>
+  <div class="table-wrap"><table><thead><tr>
+    <th style="width:172px">Nama Produk</th><th style="width:80px">Kategori</th><th style="width:108px">Harga</th>
+    <th style="width:62px">Stok</th><th style="width:80px">Status</th><th style="width:85px">Terjual</th><th style="width:78px">Aksi</th>
+  </tr></thead><tbody id="prod-table"><tr class="empty-row"><td colspan="7">Memuat data...</td></tr></tbody></table></div>
+</div>
+
+<!-- TRANSAKSI -->
+<div class="page" id="page-transaksi">
+  <div class="toolbar">
+    <input class="search-box" placeholder="Cari nama, produk..." oninput="renderTransaksi()" id="trans-search">
+    <select class="filter-sel" onchange="renderTransaksi()" id="trans-filter"><option value="">Semua Status</option><option>Sukses</option><option>Pending</option><option>Gagal</option></select>
+    <button class="btn btn-navy" onclick="openModal('transaksi')">+ Tambah Transaksi</button>
+  </div>
+  <div class="table-wrap"><table><thead><tr>
+    <th style="width:128px">Lead</th><th style="width:145px">Produk</th><th style="width:100px">Kampanye</th>
+    <th style="width:108px">Jumlah</th><th style="width:76px">Status</th><th style="width:92px">Tanggal</th><th style="width:68px">Aksi</th>
+  </tr></thead><tbody id="trans-table"><tr class="empty-row"><td colspan="7">Memuat data...</td></tr></tbody></table></div>
+</div>
+
+<!-- LAPORAN -->
+<div class="page" id="page-laporan"><div id="laporan-content"></div></div>
+
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <div style="display:flex;align-items:center;gap:12px">
+      <div class="footer-logo-mini"><span>A</span></div>
+      <div>
+        <div class="footer-brand">AMANSAKA VILLA PARK</div>
+        <div class="footer-tagline">Marketing Database System &nbsp;·&nbsp; Terhubung ke Google Sheets</div>
+      </div>
+    </div>
+    <div style="font-size:10px;color:rgba(255,255,255,0.35);text-align:right">&copy; 2025 AMANSAKA VILLA PARK<br>All rights reserved</div>
+  </footer>
+</div>
+
+<!-- PRINT PREVIEW -->
+<div class="preview-bg" id="preview-bg">
+  <div class="preview-shell">
+    <div class="preview-topbar">
+      <div class="preview-topbar-title" id="preview-title-bar">Preview Cetak</div>
+      <div class="preview-topbar-actions">
+        <button class="prev-btn" onclick="closePrintPreview()">✕ Tutup</button>
+        <button class="prev-print-btn" onclick="doPrint()">🖨 Cetak / Simpan PDF</button>
+      </div>
+    </div>
+    <div class="preview-page-wrap">
+      <div class="preview-page" id="preview-page-content"></div>
+    </div>
+  </div>
+</div>
+
+<!-- MODALS -->
+<div class="modal-bg" id="modal-lead">
+  <div class="modal">
+    <h2 id="lead-modal-title">Tambah Lead Baru</h2>
+    <div class="form-grid">
+      <div class="form-group"><label class="form-label">Nama Lengkap</label><input class="form-input" id="l-name" placeholder="Nama"></div>
+      <div class="form-group"><label class="form-label">Email</label><input class="form-input" id="l-email" placeholder="email@domain.com"></div>
+      <div class="form-group"><label class="form-label">No. Telepon</label><input class="form-input" id="l-phone" placeholder="08xx"></div>
+      <div class="form-group"><label class="form-label">Perusahaan</label><input class="form-input" id="l-company" placeholder="PT / CV"></div>
+      <div class="form-group"><label class="form-label">Kualitas Lead</label><select class="form-input" id="l-quality"><option>Hot</option><option>Warm</option><option>Cold</option><option>New</option></select></div>
+      <div class="form-group"><label class="form-label">Status</label><select class="form-input" id="l-status"><option>Aktif</option><option>Tidak Aktif</option><option>Closed</option></select></div>
+      <div class="form-group full"><label class="form-label">Kampanye</label><select class="form-input" id="l-camp"><option value="">-- Pilih Kampanye --</option></select></div>
+      <div class="form-group full"><label class="form-label">Catatan</label><textarea class="form-input" id="l-notes" rows="2" placeholder="Catatan..."></textarea></div>
+    </div>
+    <div class="modal-actions"><button class="btn" onclick="closeModal('lead')">Batal</button><button class="btn btn-navy" id="save-lead-btn" onclick="saveLead()">Simpan</button></div>
+  </div>
+</div>
+
+<div class="modal-bg" id="modal-kampanye">
+  <div class="modal">
+    <h2 id="camp-modal-title">Tambah Kampanye</h2>
+    <div class="form-grid">
+      <div class="form-group full"><label class="form-label">Nama Kampanye</label><input class="form-input" id="c-name"></div>
+      <div class="form-group"><label class="form-label">Tipe</label><select class="form-input" id="c-type"><option>Email</option><option>Social Media</option><option>SEO</option><option>Event</option><option>Ads</option></select></div>
+      <div class="form-group"><label class="form-label">Status</label><select class="form-input" id="c-status"><option>Aktif</option><option>Paused</option><option>Selesai</option></select></div>
+      <div class="form-group"><label class="form-label">Anggaran (Rp)</label><input class="form-input" id="c-budget" type="number"></div>
+      <div class="form-group"><label class="form-label">Target Lead</label><input class="form-input" id="c-target" type="number"></div>
+      <div class="form-group"><label class="form-label">Tanggal Mulai</label><input class="form-input" id="c-start" type="date"></div>
+      <div class="form-group"><label class="form-label">Tanggal Selesai</label><input class="form-input" id="c-end" type="date"></div>
+    </div>
+    <div class="modal-actions"><button class="btn" onclick="closeModal('kampanye')">Batal</button><button class="btn btn-navy" id="save-camp-btn" onclick="saveKampanye()">Simpan</button></div>
+  </div>
+</div>
+
+<div class="modal-bg" id="modal-produk">
+  <div class="modal">
+    <h2 id="prod-modal-title">Tambah Produk</h2>
+    <div class="form-grid">
+      <div class="form-group full"><label class="form-label">Nama Produk</label><input class="form-input" id="p-name"></div>
+      <div class="form-group"><label class="form-label">Kategori</label><select class="form-input" id="p-cat"><option>Fisik</option><option>Digital</option><option>Layanan</option></select></div>
+      <div class="form-group"><label class="form-label">Status</label><select class="form-input" id="p-status"><option>Aktif</option><option>Tidak Aktif</option></select></div>
+      <div class="form-group"><label class="form-label">Harga (Rp)</label><input class="form-input" id="p-price" type="number"></div>
+      <div class="form-group"><label class="form-label">Stok</label><input class="form-input" id="p-stock" type="number"></div>
+      <div class="form-group full"><label class="form-label">Deskripsi</label><textarea class="form-input" id="p-desc" rows="2"></textarea></div>
+    </div>
+    <div class="modal-actions"><button class="btn" onclick="closeModal('produk')">Batal</button><button class="btn btn-navy" id="save-prod-btn" onclick="saveProduk()">Simpan</button></div>
+  </div>
+</div>
+
+<div class="modal-bg" id="modal-transaksi">
+  <div class="modal">
+    <h2 id="trans-modal-title">Tambah Transaksi</h2>
+    <div class="form-grid">
+      <div class="form-group full"><label class="form-label">Lead</label><select class="form-input" id="t-lead"><option value="">-- Pilih Lead --</option></select></div>
+      <div class="form-group full"><label class="form-label">Produk</label><select class="form-input" id="t-prod"><option value="">-- Pilih Produk --</option></select></div>
+      <div class="form-group"><label class="form-label">Kampanye</label><select class="form-input" id="t-camp"><option value="">-- Opsional --</option></select></div>
+      <div class="form-group"><label class="form-label">Jumlah (Rp)</label><input class="form-input" id="t-amount" type="number"></div>
+      <div class="form-group"><label class="form-label">Status</label><select class="form-input" id="t-status"><option>Sukses</option><option>Pending</option><option>Gagal</option></select></div>
+      <div class="form-group"><label class="form-label">Tanggal</label><input class="form-input" id="t-date" type="date"></div>
+    </div>
+    <div class="modal-actions"><button class="btn" onclick="closeModal('transaksi')">Batal</button><button class="btn btn-navy" id="save-trans-btn" onclick="saveTransaksi()">Simpan</button></div>
+  </div>
+</div>
+
+<script>
+var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz87bR7oB2SCI-5EUdWlPcse0RB5aaAeMZgQjbzvpxGyXtZnivlApccEdyVvAlLAFwfmQ/exec';
+
+var PASS = { owner: 'owner123', marketing: 'marketing123' };
+var currentRole = null, selectedRole = 'owner', editId = null;
+var db = { leads: [], kampanye: [], produk: [], transaksi: [] };
+
+function fmt(n) { return new Intl.NumberFormat('id-ID').format(Number(n)||0); }
+function isOwner() { return currentRole === 'owner'; }
+function nowStr() { return new Date().toLocaleDateString('id-ID',{day:'2-digit',month:'long',year:'numeric'}); }
+function genId() { return Date.now() + Math.floor(Math.random()*1000); }
+
+function showToast(msg, type) {
+  type = type || 'success';
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show ' + type;
+  setTimeout(function(){ t.className = 'toast'; }, 3000);
+}
+
+function setSyncStatus(status) {
+  var dot = document.getElementById('sync-dot');
+  var label = document.getElementById('sync-label');
+  dot.className = 'sync-dot' + (status==='syncing'?' syncing':status==='error'?' error':'');
+  label.textContent = status==='syncing'?'Menyimpan...':status==='error'?'Gagal sinkron':'Tersinkron';
+}
+
+function showLoading(text) {
+  text = text || 'Memuat data...';
+  document.getElementById('loading-text').textContent = text;
+  document.getElementById('loading-overlay').classList.add('show');
+}
+function hideLoading() { document.getElementById('loading-overlay').classList.remove('show'); }
+
+async function gsRead(sheet) {
+  var url = SCRIPT_URL + '?sheet=' + sheet;
+  var res = await fetch(url);
+  if (!res.ok) throw new Error('Gagal membaca ' + sheet);
+  return await res.json();
+}
+
+async function gsWrite(action, sheet, data, id) {
+  var payload = { action: action, sheet: sheet, data: data, id: id };
+  var res = await fetch(SCRIPT_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain' },
+    body: JSON.stringify(payload)
+  });
+  if (!res.ok) throw new Error('Gagal menulis ke ' + sheet);
+  return await res.json();
+}
+
+async function loadSheet(sheet) {
+  try {
+    var rows = await gsRead(sheet);
+    db[sheet] = rows.map(function(r) {
+      var obj = {};
+      Object.keys(r).forEach(function(k){ obj[k] = r[k]; });
+      if (r.id) obj.id = String(r.id);
+      if (r.budget !== undefined) obj.budget = Number(r.budget)||0;
+      if (r.target !== undefined) obj.target = Number(r.target)||0;
+      if (r.price !== undefined) obj.price = Number(r.price)||0;
+      if (r.stock !== undefined) obj.stock = Number(r.stock)||0;
+      if (r.sold !== undefined) obj.sold = Number(r.sold)||0;
+      if (r.amount !== undefined) obj.amount = Number(r.amount)||0;
+      return obj;
+    });
+  } catch(e) {
+    console.error('loadSheet error:', sheet, e);
+    showToast('Gagal memuat ' + sheet + '. Cek koneksi.', 'error');
+  }
+}
+
+async function refreshAll() {
+  setSyncStatus('syncing');
+  showLoading('Memuat semua data dari Google Sheets...');
+  await Promise.all([
+    loadSheet('leads'),
+    loadSheet('kampanye'),
+    loadSheet('produk'),
+    loadSheet('transaksi')
+  ]);
+  hideLoading();
+  setSyncStatus('ok');
+  var page = document.querySelector('.page.active').id.replace('page-','');
+  if(page==='dashboard') updateDashboard();
+  if(page==='leads') renderLeads();
+  if(page==='kampanye') renderKampanye();
+  if(page==='produk') renderProduk();
+  if(page==='transaksi') renderTransaksi();
+  if(page==='laporan') renderLaporan();
+  showToast('Data berhasil disinkronkan');
+}
+
+function selectRole(r, el) {
+  selectedRole = r;
+  document.querySelectorAll('.role-tab').forEach(function(t){ t.classList.remove('active'); });
+  el.classList.add('active');
+  document.getElementById('login-pass').value = '';
+  document.getElementById('login-err').style.display = 'none';
+}
+
+async function doLogin() {
+  var pass = document.getElementById('login-pass').value;
+  if (pass === PASS[selectedRole]) {
+    currentRole = selectedRole;
+    document.getElementById('login-screen').style.display = 'none';
+    var app = document.getElementById('app-screen');
+    app.style.display = 'flex'; app.style.flexDirection = 'column';
+    var badge = document.getElementById('role-badge');
+    badge.textContent = isOwner() ? 'Owner' : 'Marketing';
+    badge.className = 'sidebar-role ' + (isOwner() ? 'role-owner' : 'role-marketing');
+    document.getElementById('user-label').textContent = isOwner() ? 'Owner' : 'Marketing';
+    document.getElementById('user-dot').style.background = isOwner() ? '#d4af37' : '#63b3ed';
+    document.getElementById('nav-owner-section').style.display = isOwner() ? 'block' : 'none';
+    await refreshAll();
+    updateDashboard();
+  } else {
+    document.getElementById('login-err').style.display = 'block';
+  }
+}
+
+function logout() {
+  currentRole = null;
+  document.getElementById('app-screen').style.display = 'none';
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('login-pass').value = '';
+  document.getElementById('login-err').style.display = 'none';
+  document.querySelectorAll('.role-tab').forEach(function(t,i){ t.classList.toggle('active', i===0); });
+  selectedRole = 'owner';
+  db = { leads:[], kampanye:[], produk:[], transaksi:[] };
+}
+
+async function showPage(id, el) {
+  if (id==='laporan' && !isOwner()) return;
+  document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('active'); });
+  document.querySelectorAll('.nav-item').forEach(function(n){ n.classList.remove('active'); });
+  document.getElementById('page-'+id).classList.add('active');
+  if (el) el.classList.add('active');
+  var titles = {dashboard:'Dashboard',leads:'Kontak / Lead',kampanye:'Kampanye',produk:'Produk',transaksi:'Transaksi',laporan:'Laporan Keuangan'};
+  document.getElementById('page-title').textContent = titles[id]||id;
+  if(id==='dashboard') updateDashboard();
+  if(id==='leads') renderLeads();
+  if(id==='kampanye') renderKampanye();
+  if(id==='produk') renderProduk();
+  if(id==='transaksi') renderTransaksi();
+  if(id==='laporan') renderLaporan();
+}
+
+function qualityBadge(q) {
+  var m = {Hot:'badge-hot',Warm:'badge-warm',Cold:'badge-cold',New:'badge-new'};
+  return '<span class="badge ' + (m[q]||'') + '">' + q + '</span>';
+}
+function statusBadge(s) {
+  var m = {Aktif:'badge-active','Tidak Aktif':'badge-inactive',Closed:'badge-closed',Sukses:'badge-active',Pending:'badge-warm',Gagal:'badge-hot',Selesai:'badge-inactive',Paused:'badge-paused'};
+  return '<span class="badge ' + (m[s]||'') + '">' + s + '</span>';
+}
+function prBadge(q) {
+  var colors = {Hot:'background:#fee2e2;color:#991b1b',Warm:'background:#fef3c7;color:#92400e',Cold:'background:#dbeafe;color:#1e40af',New:'background:#ede9fe;color:#5b21b6',Aktif:'background:#d1fae5;color:#065f46','Tidak Aktif':'background:#f3f4f6;color:#6b7280',Closed:'background:#fce7f3;color:#9d174d',Sukses:'background:#d1fae5;color:#065f46',Pending:'background:#fef3c7;color:#92400e',Gagal:'background:#fee2e2;color:#991b1b',Selesai:'background:#f3f4f6;color:#6b7280',Paused:'background:#f9fafb;color:#374151'};
+  return '<span class="pr-badge" style="' + (colors[q]||'background:#f3f4f6;color:#333') + '">' + q + '</span>';
+}
+
+function updateDashboard() {
+  document.getElementById('d-leads').textContent = db.leads.length;
+  document.getElementById('d-camp').textContent = db.kampanye.filter(function(c){return c.status==='Aktif';}).length;
+  document.getElementById('d-prod').textContent = db.produk.length;
+  var sukses = db.transaksi.filter(function(t){return t.status==='Sukses';});
+  var total = sukses.reduce(function(s,t){return s+Number(t.amount);},0);
+  var omzetEl = document.getElementById('d-omzet');
+  var omzetCard = document.getElementById('stat-omzet');
+  omzetEl.textContent = 'Rp ' + fmt(total);
+  if(isOwner()){omzetEl.classList.remove('omzet-blur');omzetCard.classList.remove('locked-overlay');}
+  else{omzetEl.classList.add('omzet-blur');omzetCard.classList.add('locked-overlay');}
+  document.getElementById('d-trans-count').textContent = sukses.length + ' transaksi sukses';
+
+  var qc = {Hot:0,Warm:0,Cold:0,New:0};
+  db.leads.forEach(function(l){ qc[l.quality] = (qc[l.quality]||0)+1; });
+  var max = Math.max.apply(null, Object.values(qc).concat([1]));
+  var colors = {Hot:'#ef4444',Warm:'#f59e0b',Cold:'#3b82f6',New:'#8b5cf6'};
+  document.getElementById('lead-quality-chart').innerHTML = Object.entries(qc).map(function(e){
+    return '<div class="chart-bar-row"><div class="chart-bar-label">'+e[0]+'</div><div class="chart-bar-track"><div class="chart-bar-fill" style="width:'+Math.round(e[1]/max*100)+'%;background:'+colors[e[0]]+'"></div></div><div class="chart-bar-val">'+e[1]+'</div></div>';
+  }).join('');
+
+  document.getElementById('recent-leads').innerHTML = db.leads.slice(-5).reverse().map(function(l){
+    return '<li><span>'+l.name+'</span>'+qualityBadge(l.quality)+'</li>';
+  }).join('') || '<li><span style="color:#aaa">Belum ada data</span></li>';
+
+  document.getElementById('recent-trans').innerHTML = db.transaksi.slice(-5).reverse().map(function(t){
+    return '<li><span>'+t.lead+'</span><span class="'+(isOwner()?'':'omzet-blur')+'" style="font-weight:700">Rp '+fmt(t.amount)+'</span></li>';
+  }).join('') || '<li><span style="color:#aaa">Belum ada data</span></li>';
+
+  document.getElementById('active-camps').innerHTML = db.kampanye.filter(function(c){return c.status==='Aktif';}).map(function(c){
+    return '<li><span>'+c.name+'</span><span style="font-size:11px;color:#888">'+c.type+'</span></li>';
+  }).join('') || '<li><span style="color:#aaa">Tidak ada kampanye aktif</span></li>';
+}
+
+function renderLeads() {
+  var s = (document.getElementById('lead-search').value||'').toLowerCase();
+  var q = document.getElementById('lead-filter-quality').value;
+  var st = document.getElementById('lead-filter-status').value;
+  var rows = db.leads.filter(function(l) {
+    if(s && !(l.name+l.email+l.company).toLowerCase().includes(s)) return false;
+    if(q && l.quality!==q) return false;
+    if(st && l.status!==st) return false;
+    return true;
+  });
+  var tbody = document.getElementById('lead-table');
+  if(!rows.length){tbody.innerHTML='<tr class="empty-row"><td colspan="7">Tidak ada data ditemukan</td></tr>';return;}
+  tbody.innerHTML = rows.map(function(l){
+    return '<tr><td title="'+l.name+'">'+l.name+'</td><td title="'+l.email+'">'+l.email+'</td><td>'+l.company+'</td><td>'+qualityBadge(l.quality)+'</td><td>'+statusBadge(l.status)+'</td><td>'+(l.camp||'—')+'</td><td><div class="td-action"><button class="icon-btn" onclick="editLead(\''+l.id+'\')" title="Edit">✎</button><button class="icon-btn" '+(isOwner()?'onclick="delItem(\'leads\',\''+l.id+'\')"':'disabled title="Hanya Owner"')+' title="Hapus">✕</button></div></td></tr>';
+  }).join('');
+}
+
+function renderKampanye() {
+  var s = (document.getElementById('camp-search').value||'').toLowerCase();
+  var st = document.getElementById('camp-filter').value;
+  var rows = db.kampanye.filter(function(c) {
+    if(s && !c.name.toLowerCase().includes(s)) return false;
+    if(st && c.status!==st) return false;
+    return true;
+  });
+  var tbody = document.getElementById('camp-table');
+  if(!rows.length){tbody.innerHTML='<tr class="empty-row"><td colspan="8">Tidak ada data ditemukan</td></tr>';return;}
+  tbody.innerHTML = rows.map(function(c){
+    var lc = db.leads.filter(function(l){return l.camp===c.name;}).length;
+    return '<tr><td>'+c.name+'</td><td>'+c.type+'</td><td>'+statusBadge(c.status)+'</td><td>'+(isOwner()?'Rp '+fmt(c.budget):'<span class="omzet-blur">Rp '+fmt(c.budget)+'</span>')+'</td><td>'+lc+'</td><td>'+c.start+'</td><td>'+c.end+'</td><td><div class="td-action"><button class="icon-btn" onclick="editKampanye(\''+c.id+'\')">✎</button><button class="icon-btn" '+(isOwner()?'onclick="delItem(\'kampanye\',\''+c.id+'\')"':'disabled')+' title="Hapus">✕</button></div></td></tr>';
+  }).join('');
+}
+
+function renderProduk() {
+  var s = (document.getElementById('prod-search').value||'').toLowerCase();
+  var cat = document.getElementById('prod-filter').value;
+  var rows = db.produk.filter(function(p) {
+    if(s && !p.name.toLowerCase().includes(s)) return false;
+    if(cat && p.cat!==cat) return false;
+    return true;
+  });
+  var tbody = document.getElementById('prod-table');
+  if(!rows.length){tbody.innerHTML='<tr class="empty-row"><td colspan="7">Tidak ada data ditemukan</td></tr>';return;}
+  tbody.innerHTML = rows.map(function(p){
+    return '<tr><td>'+p.name+'</td><td>'+p.cat+'</td><td>'+(isOwner()?'Rp '+fmt(p.price):'<span class="omzet-blur">Rp '+fmt(p.price)+'</span>')+'</td><td>'+(p.stock==0&&p.cat!=='Layanan'?'<span style="color:#ef4444">Habis</span>':p.stock)+'</td><td>'+statusBadge(p.status)+'</td><td>'+p.sold+' unit</td><td><div class="td-action"><button class="icon-btn" '+(isOwner()?'onclick="editProduk(\''+p.id+'\')"':'disabled title="Hanya Owner"')+'>✎</button><button class="icon-btn" '+(isOwner()?'onclick="delItem(\'produk\',\''+p.id+'\')"':'disabled')+' title="Hapus">✕</button></div></td></tr>';
+  }).join('');
+}
+
+function renderTransaksi() {
+  var s = (document.getElementById('trans-search').value||'').toLowerCase();
+  var st = document.getElementById('trans-filter').value;
+  var rows = db.transaksi.filter(function(t) {
+    if(s && !(t.lead+t.prod).toLowerCase().includes(s)) return false;
+    if(st && t.status!==st) return false;
+    return true;
+  });
+  var tbody = document.getElementById('trans-table');
+  if(!rows.length){tbody.innerHTML='<tr class="empty-row"><td colspan="7">Tidak ada data ditemukan</td></tr>';return;}
+  tbody.innerHTML = rows.map(function(t){
+    return '<tr><td>'+t.lead+'</td><td>'+t.prod+'</td><td>'+(t.camp||'—')+'</td><td>'+(isOwner()?'Rp '+fmt(t.amount):'<span class="omzet-blur">Rp '+fmt(t.amount)+'</span>')+'</td><td>'+statusBadge(t.status)+'</td><td>'+t.date+'</td><td><div class="td-action"><button class="icon-btn" onclick="editTransaksi(\''+t.id+'\')">✎</button><button class="icon-btn" '+(isOwner()?'onclick="delItem(\'transaksi\',\''+t.id+'\')"':'disabled')+' title="Hapus">✕</button></div></td></tr>';
+  }).join('');
+}
+
+function renderLaporan() {
+  if(!isOwner()){document.getElementById('laporan-content').innerHTML='<div class="access-denied"><div style="font-size:36px;margin-bottom:12px">🔒</div><h3>Akses Terbatas</h3><p>Halaman ini hanya untuk Owner.</p></div>';return;}
+  var sukses = db.transaksi.filter(function(t){return t.status==='Sukses';});
+  var totalOmzet = sukses.reduce(function(s,t){return s+Number(t.amount);},0);
+  var totalAnggaran = db.kampanye.reduce(function(s,c){return s+Number(c.budget);},0);
+  var roi = totalAnggaran ? ((totalOmzet/totalAnggaran)*100).toFixed(1):'0';
+  var perProduk={};sukses.forEach(function(t){perProduk[t.prod]=(perProduk[t.prod]||0)+Number(t.amount);});
+  var perKamp={};sukses.forEach(function(t){if(t.camp)perKamp[t.camp]=(perKamp[t.camp]||0)+Number(t.amount);});
+  document.getElementById('laporan-content').innerHTML='<div class="stat-grid"><div class="stat-card"><div class="stat-label">Total Omzet</div><div class="stat-val" style="color:#065f46">Rp '+fmt(totalOmzet)+'</div><div class="stat-sub">'+sukses.length+' transaksi sukses</div></div><div class="stat-card"><div class="stat-label">Total Anggaran</div><div class="stat-val" style="color:#1e40af">Rp '+fmt(totalAnggaran)+'</div><div class="stat-sub">'+db.kampanye.length+' kampanye</div></div><div class="stat-card"><div class="stat-label">ROI Estimasi</div><div class="stat-val" style="color:#92400e">'+roi+'%</div><div class="stat-sub">Omzet / Anggaran</div></div><div class="stat-card"><div class="stat-label">Rata-rata Transaksi</div><div class="stat-val">Rp '+fmt(sukses.length?Math.round(totalOmzet/sukses.length):0)+'</div><div class="stat-sub">per transaksi sukses</div></div></div><div class="section-row"><div class="card"><div class="card-title">Omzet per Produk</div>'+Object.entries(perProduk).sort(function(a,b){return b[1]-a[1];}).map(function(e){return '<div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid #f0f2f5;font-size:12px"><span>'+e[0]+'</span><strong>Rp '+fmt(e[1])+'</strong></div>';}).join('')+'</div><div class="card"><div class="card-title">Omzet per Kampanye</div>'+Object.entries(perKamp).sort(function(a,b){return b[1]-a[1];}).map(function(e){return '<div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid #f0f2f5;font-size:12px"><span>'+e[0]+'</span><strong>Rp '+fmt(e[1])+'</strong></div>';}).join('')+'</div></div>';
+}
+
+async function delItem(type, id) {
+  if(!isOwner()){alert('Hanya Owner yang dapat menghapus data.');return;}
+  if(!confirm('Yakin ingin menghapus data ini?')) return;
+  setSyncStatus('syncing');
+  try {
+    await gsWrite('delete', type, {}, id);
+    db[type] = db[type].filter(function(x){return String(x.id)!==String(id);});
+    if(type==='leads') renderLeads();
+    if(type==='kampanye') renderKampanye();
+    if(type==='produk') renderProduk();
+    if(type==='transaksi') renderTransaksi();
+    setSyncStatus('ok');
+    showToast('Data berhasil dihapus');
+  } catch(e) {
+    setSyncStatus('error');
+    showToast('Gagal menghapus data.','error');
+  }
+}
+
+function openModal(type) {
+  editId = null;
+  if(type==='lead'){
+    document.getElementById('lead-modal-title').textContent='Tambah Lead Baru';
+    ['l-name','l-email','l-phone','l-company','l-notes'].forEach(function(id){document.getElementById(id).value='';});
+    document.getElementById('l-quality').value='Hot';document.getElementById('l-status').value='Aktif';
+    var sel=document.getElementById('l-camp');
+    sel.innerHTML='<option value="">-- Pilih Kampanye --</option>'+db.kampanye.map(function(c){return '<option>'+c.name+'</option>';}).join('');
+  }
+  if(type==='kampanye'){
+    document.getElementById('camp-modal-title').textContent='Tambah Kampanye Baru';
+    ['c-name','c-budget','c-target','c-start','c-end'].forEach(function(id){document.getElementById(id).value='';});
+    document.getElementById('c-type').value='Email';document.getElementById('c-status').value='Aktif';
+  }
+  if(type==='produk'){
+    if(!isOwner()){alert('Hanya Owner yang dapat mengubah data produk.');return;}
+    document.getElementById('prod-modal-title').textContent='Tambah Produk Baru';
+    ['p-name','p-price','p-stock','p-desc'].forEach(function(id){document.getElementById(id).value='';});
+    document.getElementById('p-cat').value='Fisik';document.getElementById('p-status').value='Aktif';
+  }
+  if(type==='transaksi'){
+    document.getElementById('trans-modal-title').textContent='Tambah Transaksi Baru';
+    ['t-amount','t-date'].forEach(function(id){document.getElementById(id).value='';});
+    document.getElementById('t-status').value='Sukses';
+    var tl=document.getElementById('t-lead');
+    tl.innerHTML='<option value="">-- Pilih Lead --</option>'+db.leads.map(function(l){return '<option>'+l.name+'</option>';}).join('');
+    var tp=document.getElementById('t-prod');
+    tp.innerHTML='<option value="">-- Pilih Produk --</option>'+db.produk.map(function(p){return '<option value="'+p.price+'" data-name="'+p.name+'">'+p.name+'</option>';}).join('');
+    tp.onchange=function(){if(this.value)document.getElementById('t-amount').value=this.value;};
+    var tc=document.getElementById('t-camp');
+    tc.innerHTML='<option value="">-- Opsional --</option>'+db.kampanye.map(function(c){return '<option>'+c.name+'</option>';}).join('');
+  }
+  document.getElementById('modal-'+type).classList.add('open');
+}
+function closeModal(type){document.getElementById('modal-'+type).classList.remove('open');}
+
+function editLead(id){
+  var l=db.leads.find(function(x){return String(x.id)===String(id);});if(!l)return;editId=id;
+  document.getElementById('lead-modal-title').textContent='Edit Lead';
+  document.getElementById('l-name').value=l.name||'';document.getElementById('l-email').value=l.email||'';
+  document.getElementById('l-phone').value=l.phone||'';document.getElementById('l-company').value=l.company||'';
+  document.getElementById('l-quality').value=l.quality||'Hot';document.getElementById('l-status').value=l.status||'Aktif';
+  document.getElementById('l-notes').value=l.notes||'';
+  var sel=document.getElementById('l-camp');
+  sel.innerHTML='<option value="">-- Pilih Kampanye --</option>'+db.kampanye.map(function(c){return '<option '+(c.name===l.camp?'selected':'')+'>'+c.name+'</option>';}).join('');
+  document.getElementById('modal-lead').classList.add('open');
+}
+function editKampanye(id){
+  var c=db.kampanye.find(function(x){return String(x.id)===String(id);});if(!c)return;editId=id;
+  document.getElementById('camp-modal-title').textContent='Edit Kampanye';
+  document.getElementById('c-name').value=c.name||'';document.getElementById('c-type').value=c.type||'Email';
+  document.getElementById('c-status').value=c.status||'Aktif';document.getElementById('c-budget').value=c.budget||0;
+  document.getElementById('c-target').value=c.target||0;document.getElementById('c-start').value=c.start||'';
+  document.getElementById('c-end').value=c.end||'';
+  document.getElementById('modal-kampanye').classList.add('open');
+}
+function editProduk(id){
+  if(!isOwner()){alert('Hanya Owner.');return;}
+  var p=db.produk.find(function(x){return String(x.id)===String(id);});if(!p)return;editId=id;
+  document.getElementById('prod-modal-title').textContent='Edit Produk';
+  document.getElementById('p-name').value=p.name||'';document.getElementById('p-cat').value=p.cat||'Fisik';
+  document.getElementById('p-price').value=p.price||0;document.getElementById('p-stock').value=p.stock||0;
+  document.getElementById('p-status').value=p.status||'Aktif';document.getElementById('p-desc').value=p.desc||'';
+  document.getElementById('modal-produk').classList.add('open');
+}
+function editTransaksi(id){
+  var t=db.transaksi.find(function(x){return String(x.id)===String(id);});if(!t)return;editId=id;
+  document.getElementById('trans-modal-title').textContent='Edit Transaksi';
+  var tl=document.getElementById('t-lead');
+  tl.innerHTML='<option value="">-- Pilih Lead --</option>'+db.leads.map(function(l){return '<option '+(l.name===t.lead?'selected':'')+'>'+l.name+'</option>';}).join('');
+  var tp=document.getElementById('t-prod');
+  tp.innerHTML='<option value="">-- Pilih Produk --</option>'+db.produk.map(function(p){return '<option value="'+p.price+'" data-name="'+p.name+'" '+(p.name===t.prod?'selected':'')+'>'+p.name+'</option>';}).join('');
+  tp.onchange=function(){if(this.value)document.getElementById('t-amount').value=this.value;};
+  var tc=document.getElementById('t-camp');
+  tc.innerHTML='<option value="">-- Opsional --</option>'+db.kampanye.map(function(c){return '<option '+(c.name===t.camp?'selected':'')+'>'+c.name+'</option>';}).join('');
+  document.getElementById('t-amount').value=t.amount||0;
+  document.getElementById('t-status').value=t.status||'Sukses';document.getElementById('t-date').value=t.date||'';
+  document.getElementById('modal-transaksi').classList.add('open');
+}
+
+function setBtnLoading(btnId, loading) {
+  var btn = document.getElementById(btnId);
+  if(!btn) return;
+  btn.disabled = loading;
+  btn.textContent = loading ? 'Menyimpan...' : 'Simpan';
+}
+
+async function saveLead(){
+  var obj={id:editId||genId(),name:document.getElementById('l-name').value.trim(),email:document.getElementById('l-email').value.trim(),phone:document.getElementById('l-phone').value.trim(),company:document.getElementById('l-company').value.trim(),quality:document.getElementById('l-quality').value,status:document.getElementById('l-status').value,camp:document.getElementById('l-camp').value,notes:document.getElementById('l-notes').value.trim()};
+  if(!obj.name){alert('Nama wajib diisi');return;}
+  setBtnLoading('save-lead-btn',true);setSyncStatus('syncing');
+  try{
+    var action=editId?'update':'add';
+    await gsWrite(action,'leads',obj,editId);
+    if(editId) db.leads=db.leads.map(function(x){return String(x.id)===String(editId)?obj:x;});
+    else db.leads.push(obj);
+    closeModal('lead');renderLeads();updateDashboard();
+    setSyncStatus('ok');showToast(editId?'Lead berhasil diperbarui':'Lead berhasil ditambahkan');
+  }catch(e){setSyncStatus('error');showToast('Gagal menyimpan. Coba lagi.','error');}
+  setBtnLoading('save-lead-btn',false);editId=null;
+}
+
+async function saveKampanye(){
+  var obj={id:editId||genId(),name:document.getElementById('c-name').value.trim(),type:document.getElementById('c-type').value,status:document.getElementById('c-status').value,budget:parseInt(document.getElementById('c-budget').value)||0,target:parseInt(document.getElementById('c-target').value)||0,start:document.getElementById('c-start').value,end:document.getElementById('c-end').value};
+  if(!obj.name){alert('Nama wajib diisi');return;}
+  setBtnLoading('save-camp-btn',true);setSyncStatus('syncing');
+  try{
+    var action=editId?'update':'add';
+    await gsWrite(action,'kampanye',obj,editId);
+    if(editId) db.kampanye=db.kampanye.map(function(x){return String(x.id)===String(editId)?obj:x;});
+    else db.kampanye.push(obj);
+    closeModal('kampanye');renderKampanye();updateDashboard();
+    setSyncStatus('ok');showToast(editId?'Kampanye berhasil diperbarui':'Kampanye berhasil ditambahkan');
+  }catch(e){setSyncStatus('error');showToast('Gagal menyimpan. Coba lagi.','error');}
+  setBtnLoading('save-camp-btn',false);editId=null;
+}
+
+async function saveProduk(){
+  if(!isOwner()){alert('Hanya Owner.');return;}
+  var existing=editId?db.produk.find(function(x){return String(x.id)===String(editId);}):null;
+  var obj={id:editId||genId(),name:document.getElementById('p-name').value.trim(),cat:document.getElementById('p-cat').value,price:parseInt(document.getElementById('p-price').value)||0,stock:parseInt(document.getElementById('p-stock').value)||0,status:document.getElementById('p-status').value,desc:document.getElementById('p-desc').value.trim(),sold:existing?existing.sold:0};
+  if(!obj.name){alert('Nama wajib diisi');return;}
+  setBtnLoading('save-prod-btn',true);setSyncStatus('syncing');
+  try{
+    var action=editId?'update':'add';
+    await gsWrite(action,'produk',obj,editId);
+    if(editId) db.produk=db.produk.map(function(x){return String(x.id)===String(editId)?obj:x;});
+    else db.produk.push(obj);
+    closeModal('produk');renderProduk();updateDashboard();
+    setSyncStatus('ok');showToast(editId?'Produk berhasil diperbarui':'Produk berhasil ditambahkan');
+  }catch(e){setSyncStatus('error');showToast('Gagal menyimpan. Coba lagi.','error');}
+  setBtnLoading('save-prod-btn',false);editId=null;
+}
+
+async function saveTransaksi(){
+  var tp=document.getElementById('t-prod');
+  var prodName=tp.options[tp.selectedIndex]?tp.options[tp.selectedIndex].getAttribute('data-name')||tp.value:'';
+  var obj={id:editId||genId(),lead:document.getElementById('t-lead').value,prod:prodName||tp.value,camp:document.getElementById('t-camp').value,amount:parseInt(document.getElementById('t-amount').value)||0,status:document.getElementById('t-status').value,date:document.getElementById('t-date').value};
+  if(!obj.lead){alert('Pilih lead terlebih dahulu');return;}
+  setBtnLoading('save-trans-btn',true);setSyncStatus('syncing');
+  try{
+    var action=editId?'update':'add';
+    await gsWrite(action,'transaksi',obj,editId);
+    if(editId) db.transaksi=db.transaksi.map(function(x){return String(x.id)===String(editId)?obj:x;});
+    else db.transaksi.push(obj);
+    closeModal('transaksi');renderTransaksi();updateDashboard();
+    setSyncStatus('ok');showToast(editId?'Transaksi berhasil diperbarui':'Transaksi berhasil ditambahkan');
+  }catch(e){setSyncStatus('error');showToast('Gagal menyimpan. Coba lagi.','error');}
+  setBtnLoading('save-trans-btn',false);editId=null;
+}
+
+function exportCSV(){
+  var page=document.querySelector('.page.active').id.replace('page-','');
+  var csv='',filename='amansaka_';
+  if(page==='leads'||page==='dashboard'){csv='Nama,Email,Telepon,Perusahaan,Kualitas,Status,Kampanye,Catatan\n'+db.leads.map(function(l){return [l.name,l.email,l.phone,l.company,l.quality,l.status,l.camp,l.notes].map(function(v){return '"'+(v||'')+'"';}).join(',');}).join('\n');filename+='leads.csv';}
+  else if(page==='kampanye'){csv='Nama,Tipe,Status,Anggaran,Target,Mulai,Selesai\n'+db.kampanye.map(function(c){return [c.name,c.type,c.status,isOwner()?c.budget:'***',c.target,c.start,c.end].join(',');}).join('\n');filename+='kampanye.csv';}
+  else if(page==='produk'){csv='Nama,Kategori,Harga,Stok,Status,Terjual\n'+db.produk.map(function(p){return [p.name,p.cat,isOwner()?p.price:'***',p.stock,p.status,p.sold].join(',');}).join('\n');filename+='produk.csv';}
+  else if(page==='transaksi'){csv='Lead,Produk,Kampanye,Jumlah,Status,Tanggal\n'+db.transaksi.map(function(t){return [t.lead,t.prod,t.camp,isOwner()?t.amount:'***',t.status,t.date].join(',');}).join('\n');filename+='transaksi.csv';}
+  if(!csv)return;
+  var blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});
+  var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=filename;a.click();
+}
+
+function buildPrintHeader(judul,sub){return '<div class="pr-header"><div class="pr-logo-area"><div class="pr-logo-circle"><span style="color:#d4af37;font-size:20px;font-weight:900;font-family:Georgia,serif">A</span></div><div><div class="pr-brand">AMANSAKA VILLA PARK</div><div class="pr-brand-sub">Marketing Database System</div></div></div><div class="pr-meta"><strong>'+judul+'</strong>'+sub+'<br>Dicetak: '+nowStr()+'<br>Oleh: '+(isOwner()?'Owner':'Marketing')+'</div></div>';}
+function buildPrintFooter(){return '<div class="pr-footer"><span>AMANSAKA VILLA PARK &nbsp;·&nbsp; Marketing Database System</span><span>Halaman 1</span><span>'+nowStr()+'</span></div>';}
+
+function buildPrintLeads(){var rows=db.leads;var qc={Hot:0,Warm:0,Cold:0,New:0};rows.forEach(function(l){qc[l.quality]=(qc[l.quality]||0)+1;});return buildPrintHeader('Laporan Kontak / Lead','Semua Data Lead')+'<div class="pr-stats"><div class="pr-stat"><div class="pr-stat-label">Total Lead</div><div class="pr-stat-val">'+rows.length+'</div></div><div class="pr-stat"><div class="pr-stat-label">Hot</div><div class="pr-stat-val" style="color:#991b1b">'+qc.Hot+'</div></div><div class="pr-stat"><div class="pr-stat-label">Warm</div><div class="pr-stat-val" style="color:#92400e">'+qc.Warm+'</div></div><div class="pr-stat"><div class="pr-stat-label">Cold</div><div class="pr-stat-val" style="color:#1e40af">'+qc.Cold+'</div></div><div class="pr-stat"><div class="pr-stat-label">New</div><div class="pr-stat-val" style="color:#5b21b6">'+qc.New+'</div></div></div><table class="pr-table"><thead><tr><th>#</th><th>Nama</th><th>Email</th><th>Perusahaan</th><th>Kualitas</th><th>Status</th><th>Kampanye</th></tr></thead><tbody>'+rows.map(function(l,i){return '<tr><td style="color:#999">'+(i+1)+'</td><td style="font-weight:600">'+l.name+'</td><td>'+l.email+'</td><td>'+l.company+'</td><td>'+prBadge(l.quality)+'</td><td>'+prBadge(l.status)+'</td><td>'+(l.camp||'—')+'</td></tr>';}).join('')+'</tbody></table>'+buildPrintFooter();}
+
+var currentPrintContent='';
+function openPrintPreview(){
+  var page=document.querySelector('.page.active').id.replace('page-','');
+  var labels={dashboard:'Semua Laporan',leads:'Kontak / Lead',kampanye:'Kampanye',produk:'Produk',transaksi:'Transaksi',laporan:'Laporan Keuangan'};
+  document.getElementById('preview-title-bar').textContent='Preview Cetak — '+labels[page];
+  var html='';
+  if(page==='leads'||page==='dashboard') html=buildPrintLeads();
+  currentPrintContent=html;
+  document.getElementById('preview-page-content').innerHTML=html;
+  document.getElementById('preview-bg').classList.add('open');
+}
+function closePrintPreview(){document.getElementById('preview-bg').classList.remove('open');}
+function doPrint(){
+  var w=window.open('','_blank','width=900,height=700');
+  w.document.write('<!DOCTYPE html><html><head><meta charset="utf-8"><title>Laporan AMANSAKA</title><style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:"Trebuchet MS",Arial,sans-serif;color:#1a1a1a;background:#fff;padding:20px}.pr-header{display:flex;align-items:center;justify-content:space-between;border-bottom:2.5px solid #0c2340;padding-bottom:16px;margin-bottom:20px}.pr-logo-circle{width:50px;height:50px;border-radius:50%;background:#0c2340;display:flex;align-items:center;justify-content:center}.pr-brand{font-size:16px;font-weight:700;letter-spacing:2px;color:#0c2340;text-transform:uppercase}.pr-brand-sub{font-size:9px;letter-spacing:1.5px;color:#b8960c;text-transform:uppercase}.pr-meta{text-align:right;font-size:11px;color:#555}.pr-meta strong{display:block;font-size:14px;color:#0c2340;font-weight:700}.pr-stats{display:flex;gap:12px;margin-bottom:20px}.pr-stat{flex:1;background:#f4f7fb;border-radius:8px;padding:12px 14px;border-left:3px solid #0c2340}.pr-stat-label{font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#666}.pr-stat-val{font-size:18px;font-weight:700;color:#0c2340}.pr-table{width:100%;border-collapse:collapse;font-size:11px}.pr-table th{background:#0c2340;color:#d4af37;padding:8px 10px;text-align:left;font-size:9px;font-weight:700;text-transform:uppercase}.pr-table td{padding:7px 10px;border-bottom:1px solid #eee}.pr-badge{display:inline-block;padding:1px 7px;border-radius:8px;font-size:9px;font-weight:700}.pr-footer{margin-top:32px;padding-top:12px;border-top:1px solid #ddd;display:flex;justify-content:space-between;font-size:9px;color:#aaa}</style></head><body>'+currentPrintContent+'</body></html>');
+  w.document.close();
+  setTimeout(function(){w.print();},600);
+}
+
+document.querySelectorAll('.modal-bg, .preview-bg').forEach(function(m){
+  m.addEventListener('click', function(e){if(e.target===this)this.classList.remove('open');});
+});
+</script>
+</body>
+</html>
